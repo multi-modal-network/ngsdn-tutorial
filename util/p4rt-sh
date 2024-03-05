@@ -99,7 +99,7 @@ def main():
     cmd.extend(new_args)
     cmd.extend(unknown_args)
     logging.debug("Running cmd: {}".format(" ".join(cmd)))
-
+    print("Running cmd: {}".format(" ".join(cmd)))
     subprocess.run(cmd)
 
     if args.config is not None:

@@ -1,0 +1,9 @@
+WARNING: Mac address to reach destination not found. Using broadcast.
+WARNING: Mac address to reach destination not found. Using broadcast.
+sending on interface h1a-eth0 to 12.14.108.26
+###[ Ethernet ]###
+  dst       = ff:ff:ff:ff:ff:ff
+  src       = 00:00:00:00:00:00
+  type      = 0x812
+###[ Raw ]###
+     load      = '\x0c\x0el-\x0c\x0el\x1a'

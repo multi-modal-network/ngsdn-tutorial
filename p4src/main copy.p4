@@ -619,6 +619,8 @@ control IngressPipeImpl (inout parsed_headers_t    hdr,
     // are executed sequentially.
 
     apply {
+
+        // If this is a packet-out from the controller...
         if (hdr.packet_out.isValid()) {
             // Set the egress port to that found in the packet-out metadata...
             standard_metadata.egress_spec = hdr.packet_out.egress_port;
@@ -627,21 +629,53 @@ control IngressPipeImpl (inout parsed_headers_t    hdr,
             // Exit the pipeline here, no need to go through other tables.
             exit;
         }
-        if (hdr.ethernet.ether_type == ETHERTYPE_ID && hdr.id.isValid()) {
-            routing_id_table.apply();
-        } else if (hdr.ipv6.isValid() && my_station_table.apply().hit) {
-            // Apply the L3 routing table to IPv6 packets, only if the
-        // destination MAC is found in the my_station_table.
-            routing_v6_table.apply();
-            // Checl TTL, drop packet if necessary to avoid loops.
-            if(hdr.ipv6.hop_limit == 0) { drop(); }
-        } else if (!l2_exact_table.apply().hit) {
-        // L2 bridging. Apply the exact table first (for unicast entries)..
-            // If an entry is NOT found, apply the ternary one in case this
-            // is a multicast/broadcast NDP NS packet for another host
-            // attached to this switch.
-            l2_ternary_table.apply();
+
+        bool do_l3_l2 = true;
+
+        // *** TODO EXERCISE 4
+        // Fill in the name of the NDP reply table created before
+        // ---- START SOLUTION ----
+        // If this is an NDP NS packet, attempt to generate a reply using the
+        // ndp_reply_table. If a matching entry is found, unset the "do_l3_l2"
+        // flag to skip the L3 and L2 tables, as the "ndp_ns_to_na" action
+        // already set an egress port.
+
+        // Uncomment this block when done.
+        /*
+        if (hdr.icmpv6.isValid() && hdr.icmpv6.type == ICMP6_TYPE_NS) {
+            if (<NAME OF NDP REPLY TABLE>.apply().hit) {
+                do_l3_l2 = false;
+            }
         }
+        */
+
+        // ---- END SOLUTION ----
+
+        if (do_l3_l2) {
+            // 身份模态路由转发
+            if (hdr.ethernet.ether_type == ETHERTYPE_ID && hdr.id.isValid()) {
+                routing_id_table.apply();
+            }
+
+            // Apply the L3 routing table to IPv6 packets, only if the
+            // destination MAC is found in the my_station_table.
+            if (hdr.ipv6.isValid() && my_station_table.apply().hit) {
+                routing_v6_table.apply();
+                // Checl TTL, drop packet if necessary to avoid loops.
+                if(hdr.ipv6.hop_limit == 0) { drop(); }
+            }
+
+            // L2 bridging. Apply the exact table first (for unicast entries)..
+            if (!l2_exact_table.apply().hit) {
+                // If an entry is NOT found, apply the ternary one in case this
+                // is a multicast/broadcast NDP NS packet for another host
+                // attached to this switch.
+                l2_ternary_table.apply();
+            }
+        }
+
+        // Lastly, apply the ACL table.
+        acl_table.apply();
     }
 }
 
@@ -675,7 +709,25 @@ control EgressPipeImpl (inout parsed_headers_t hdr,
                         inout local_metadata_t local_metadata,
                         inout standard_metadata_t standard_metadata) {
     apply {
-        
+        // If this is a packet-in to the controller, e.g., if in ingress we
+        // matched on the ACL table with action send/clone_to_cpu...
+        if (standard_metadata.egress_port == CPU_PORT) {
+            // Add packet_in header and set relevant fields, such as the
+            // switch ingress port where the packet was received.
+            hdr.packet_in.setValid();
+            hdr.packet_in.ingress_port = standard_metadata.ingress_port;
+            // Exit the pipeline here.
+            exit;
+        }
+
+        // If this is a multicast packet (flag set by l2_ternary_table), make
+        // sure we are not replicating the packet on the same port where it was
+        // received. This is useful to avoid broadcasting NDP requests on the
+        // ingress port.
+        if (local_metadata.is_multicast == true &&
+              standard_metadata.ingress_port == standard_metadata.egress_port) {
+            mark_to_drop(standard_metadata);
+        }
     }
 }
 
@@ -725,7 +777,6 @@ control DeparserImpl(packet_out packet, in parsed_headers_t hdr) {
     apply {
         packet.emit(hdr.packet_in);
         packet.emit(hdr.ethernet);
-        packet.emit(hdr.id);
         packet.emit(hdr.ipv6);
         packet.emit(hdr.tcp);
         packet.emit(hdr.udp);

@@ -2,7 +2,7 @@ version: "3"
 
 services:
   mininet:
-    image: opennetworking/mn-stratum
+    image: mn-stratum-with-scapy
     hostname: mininet
     container_name: mininet
     privileged: true

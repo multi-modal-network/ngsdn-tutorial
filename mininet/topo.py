@@ -28,7 +28,7 @@ CPU_PORT = 255
 
 class IPv6Host(Host):
 
-    def config(self, ipv6, ipv6_gw=None, **params):
+    def config(self, ipv6, ipv6_gw=None, identity=None, **params):
         super(IPv6Host, self).config(**params)
         self.cmd('ip -4 addr flush dev %s' % self.defaultIntf())
         self.cmd('ip -6 addr flush dev %s' % self.defaultIntf())
@@ -42,6 +42,12 @@ class IPv6Host(Host):
 
         def updateIP():
             return ipv6.split('/')[0]
+
+        def updateIdentity():
+            leaf = bin(0xf)[2:] + bin(int(identity[1:]) & 0xfffffff)[2:]
+            return int(leaf,2)
+
+        self.identity = identity
 
         self.defaultIntf().updateIP = updateIP
 
@@ -75,13 +81,13 @@ class TutorialTopo(Topo):
 
         # IPv6 hosts attached to leaf 1
         h1a = self.addHost('h1a', cls=IPv6Host, mac="00:00:00:00:00:1A",
-                           ipv6='2001:1:1::a/64', ipv6_gw='2001:1:1::ff')
+                           ipv6='2001:1:1::a/64', ipv6_gw='2001:1:1::ff',identity=202271789)
         h1b = self.addHost('h1b', cls=IPv6Host, mac="00:00:00:00:00:1B",
-                           ipv6='2001:1:1::b/64', ipv6_gw='2001:1:1::ff')
+                           ipv6='2001:1:1::b/64', ipv6_gw='2001:1:1::ff',identity=201814860)
         h1c = self.addHost('h1c', cls=IPv6Host, mac="00:00:00:00:00:1C",
-                           ipv6='2001:1:1::c/64', ipv6_gw='2001:1:1::ff')
+                           ipv6='2001:1:1::c/64', ipv6_gw='2001:1:1::ff',identity=202271790)
         h2 = self.addHost('h2', cls=IPv6Host, mac="00:00:00:00:00:20",
-                          ipv6='2001:1:2::1/64', ipv6_gw='2001:1:2::ff')
+                          ipv6='2001:1:2::1/64', ipv6_gw='2001:1:2::ff',identity=202271770)
         self.addLink(h1a, leaf1)  # port 3
         self.addLink(h1b, leaf1)  # port 4
         self.addLink(h1c, leaf1)  # port 5
@@ -89,9 +95,9 @@ class TutorialTopo(Topo):
 
         # IPv6 hosts attached to leaf 2
         h3 = self.addHost('h3', cls=IPv6Host, mac="00:00:00:00:00:30",
-                          ipv6='2001:2:3::1/64', ipv6_gw='2001:2:3::ff')
+                          ipv6='2001:2:3::1/64', ipv6_gw='2001:2:3::ff',identity=202271791)
         h4 = self.addHost('h4', cls=IPv6Host, mac="00:00:00:00:00:40",
-                          ipv6='2001:2:4::1/64', ipv6_gw='2001:2:4::ff')
+                          ipv6='2001:2:4::1/64', ipv6_gw='2001:2:4::ff',identity=202271792)
         self.addLink(h3, leaf2)  # port 3
         self.addLink(h4, leaf2)  # port 4
 

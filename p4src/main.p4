@@ -69,6 +69,12 @@ typedef bit<16>  l4_port_t;
 const bit<16> ETHERTYPE_IPV6 = 0x86dd;
 const bit<16> ETHERTYPE_IPV4 = 0x0800;
 const bit<16> ETHERTYPE_ID = 0x0812;
+const bit<16> ETHERTYPE_GEO = 0x8947;
+const bit<16> ETHERTYPE_MF = 0x27c0;
+const bit<16> ETHERTYPE_NDN = 0x8624;
+
+const bit<4> TYPE_geo_beacon = 1;
+const bit<4> TYPE_geo_gbc = 4;
 
 const bit<8> IP_PROTO_TCP = 6;
 const bit<8> IP_PROTO_UDP = 17;
@@ -164,6 +170,60 @@ header ndp_t {
     bit<48>      target_mac_addr;
 }
 
+// 地理模态报文首部
+header geo_t{
+    bit<4> version;
+    bit<4> nh_basic;
+    bit<8> reserved_basic;
+    bit<8> lt;
+    bit<8> rhl;
+    bit<4> nh_common;
+    bit<4> reserved_common_a;
+    bit<4> ht;  // 决定后续包型
+    bit<4> hst;
+    bit<8> tc;
+    bit<8> flag;
+    bit<16> pl;
+    bit<8> mhl;
+    bit<8> reserved_common_b;
+}
+
+header gbc_t{
+    bit<16> sn;
+    bit<16> reserved_gbc_a;
+    bit<64> gnaddr;
+    bit<32> tst;
+    bit<32> lat;
+    bit<32> longg;
+    bit<1> pai;
+    bit<15> s;
+    bit<16> h;
+    bit<32> geoAreaPosLat; //lat 请求区域中心点的纬度
+    bit<32> geoAreaPosLon; //log 请求区域中心点的经度
+    bit<16> disa;
+    bit<16> disb;
+    bit<16> angle;
+    bit<16> reserved_gbc_b;
+}
+
+
+header beacon_t{
+    bit<64> gnaddr;
+    bit<32> tst;
+    bit<32> lat;
+    bit<32> longg;
+    bit<1> pai;
+    bit<15> s;
+    bit<16> h;
+
+}
+
+header mf_t{
+    bit<32> mf_type;
+    bit<32> src_guid;
+    bit<32> dest_guid;
+}
+
 header id_t {
     bit<32> srcIdentity;
     bit<32> dstIdentity;
@@ -198,6 +258,10 @@ struct parsed_headers_t {
     ipv6_t        ipv6;
     ipv4_t        ipv4;
     id_t          id;
+    mf_t          mf;
+    geo_t         geo;
+    gbc_t         gbc;
+    beacon_t      beacon;
     tcp_t         tcp;
     udp_t         udp;
     icmpv6_t      icmpv6;
@@ -270,7 +334,10 @@ parser ParserImpl (packet_in packet,
         transition select(hdr.ethernet.ether_type){
             ETHERTYPE_IPV4: parse_ipv4;
             ETHERTYPE_IPV6: parse_ipv6;
-            ETHERTYPE_ID: parse_ID;
+            ETHERTYPE_ID: parse_id;
+            ETHERTYPE_GEO: parse_geo;
+            ETHERTYPE_MF: parse_mf;
+            ETHERTYPE_NDN: parse_ndn;
             default: accept;
         }
     }
@@ -293,8 +360,40 @@ parser ParserImpl (packet_in packet,
         }
     }
 
-    state parse_ID {
+    // 身份
+    state parse_id {
         packet.extract(hdr.id);
+        transition accept;
+    }
+
+    // NDN
+    state parse_ndn {
+        transition accept;
+    }
+
+    state parse_mf {
+        packet.extract(hdr.mf);
+        transition accept;
+    }
+
+    // 地理
+    state parse_geo {
+        packet.extract(hdr.geo);
+        transition select(hdr.geo.ht) { //
+            TYPE_geo_beacon: parse_beacon; //0x01
+            TYPE_geo_gbc: parse_gbc; //0x04
+            default: accept;
+        }
+    }
+
+
+    state parse_beacon{
+        packet.extract(hdr.beacon);
+        transition accept;
+    }
+
+    state parse_gbc{
+        packet.extract(hdr.gbc);
         transition accept;
     }
 
@@ -388,8 +487,8 @@ control IngressPipeImpl (inout parsed_headers_t    hdr,
 
     // --- l2_exact_table (for unicast entries) --------------------------------
 
-    action set_egress_port(port_num_t port_num) {
-        standard_metadata.egress_spec = port_num;
+    action set_egress_port(port_num_t dst_port) {
+        standard_metadata.egress_spec = dst_port;
     }
 
     table l2_exact_table {
@@ -449,9 +548,9 @@ control IngressPipeImpl (inout parsed_headers_t    hdr,
     //   links.
 
     // --- routing_id_table ----------------------------------------------------
-
-    action set_next_id_hop(port_num_t port_num){
-        standard_metadata.egress_spec = port_num;
+    //  身份模态
+    action set_next_id_hop(port_num_t dst_port){
+        standard_metadata.egress_spec = dst_port;
     }
 
     table routing_id_table {
@@ -462,6 +561,67 @@ control IngressPipeImpl (inout parsed_headers_t    hdr,
             set_next_id_hop;
         }
         @name("routing_id_table_counter")
+        counters = direct_counter(CounterType.packets_and_bytes);
+    }
+
+    // --- routing_mf_table -----------------------------------------------------
+    // mf模态
+    action set_next_mf_hop(port_num_t dst_port) {
+        standard_metadata.egress_spec = dst_port;
+    }
+    table routing_mf_table {
+        key = {
+             hdr.mf.dest_guid : exact;
+        }
+
+        actions = {
+            set_next_mf_hop;
+        }
+
+        @name("routing_mf_table_counter")
+        counters = direct_counter(CounterType.packets_and_bytes);
+    }
+
+    // --- routing_geo_table -----------------------------------------------------
+    // 地理模态
+    action geo_ucast_route(port_num_t dst_port) {
+        standard_metadata.egress_spec = dst_port;
+    }
+    action geo_mcast_route(mcast_group_id_t mgid1) {
+        standard_metadata.mcast_grp = mgid1;
+    }
+    table routing_geo_table {
+        key = {
+            hdr.gbc.geoAreaPosLat: exact;
+            hdr.gbc.geoAreaPosLon: exact;
+            hdr.gbc.disa: exact;
+            hdr.gbc.disb: exact;
+        }
+
+        actions = {
+            geo_ucast_route;
+            geo_mcast_route;
+        }
+
+        @name("routing_geo_table_counter")
+        counters = direct_counter(CounterType.packets_and_bytes);
+    }
+
+    // --- routing_ndn_table ------------------------------------------------------
+    // ndn模态
+    action set_next_ndn_hop(port_num_t dst_port) {
+        standard_metadata.egress_spec = dst_port;
+    }
+    table routing_ndn_table {
+        key = {
+             standard_metadata.ingress_port: exact;
+        }
+
+        actions = {
+            set_next_ndn_hop;
+        }
+
+        @name("routing_ndn_table_counter")
         counters = direct_counter(CounterType.packets_and_bytes);
     }
 
@@ -629,7 +789,13 @@ control IngressPipeImpl (inout parsed_headers_t    hdr,
         }
         if (hdr.ethernet.ether_type == ETHERTYPE_ID && hdr.id.isValid()) {
             routing_id_table.apply();
-        } else if (hdr.ipv6.isValid() && my_station_table.apply().hit) {
+        } else if (hdr.ethernet.ether_type == ETHERTYPE_GEO && hdr.geo.isValid()) {
+            routing_geo_table.apply();
+        } else if (hdr.ethernet.ether_type == ETHERTYPE_MF && hdr.mf.isValid()) {
+            routing_mf_table.apply();
+        } else if (hdr.ethernet.ether_type == ETHERTYPE_NDN) {
+            routing_ndn_table.apply();
+        }  else if (hdr.ipv6.isValid() && my_station_table.apply().hit) {
             // Apply the L3 routing table to IPv6 packets, only if the
         // destination MAC is found in the my_station_table.
             routing_v6_table.apply();

@@ -1,20 +1,21 @@
 sniffing on h2-eth0
 got an IDENTITY packet
-('Source Identity:', 202271789)
-('Destination Identity:', 202271770)
-###[ Ethernet ]###
+Source Identity: 202271789
+Destination Identity: 202271770
+###[ Ethernet ]### 
   dst       = ff:ff:ff:ff:ff:ff
-  src       = 00:00:00:00:00:00
+  src       = 00:00:00:00:00:1a
   type      = 0x812
-###[ Raw ]###
+###[ Raw ]### 
      load      = '\x0c\x0el-\x0c\x0el\x1a'
-Traceback (most recent call last):
-  File "receive.py", line 54, in <module>
-    main()
-  File "receive.py", line 51, in main
-    prn = lambda x: handle_pkt(x))
-  File "/usr/lib/python2.7/dist-packages/scapy/sendrecv.py", line 577, in sniff
-    p = s.recv(MTU)
-  File "/usr/lib/python2.7/dist-packages/scapy/arch/linux.py", line 485, in recv
-    pkt, sa_ll = self.ins.recvfrom(x)
-socket.error: [Errno 100] Network is down
+
+got an IDENTITY packet
+Source Identity: 202271789
+Destination Identity: 202271770
+###[ Ethernet ]### 
+  dst       = ff:ff:ff:ff:ff:ff
+  src       = 00:00:00:00:00:1a
+  type      = 0x812
+###[ Raw ]### 
+     load      = '\x0c\x0el-\x0c\x0el\x1a'
+

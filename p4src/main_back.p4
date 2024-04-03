@@ -30,9 +30,6 @@
 //   |      |  |CKSUM |  |PIPE   |  |MANAGER|  |PIPE  |  |CKSUM |  |        |
 //   +------+  +------+  +-------+  +--------  +------+  +------+  +--------+
 //
-// All blocks are P4 programmable, except for the Traffic Manager, which is
-// fixed-function. In the rest of this P4 program, we provide an implementation
-// for each one of the 6 programmable blocks.
 
 //------------------------------------------------------------------------------
 // PRE-PROCESSOR constants
@@ -70,6 +67,14 @@ typedef bit<16>  l4_port_t;
 // CONSTANT VALUES
 //------------------------------------------------------------------------------
 const bit<16> ETHERTYPE_IPV6 = 0x86dd;
+const bit<16> ETHERTYPE_IPV4 = 0x0800;
+const bit<16> ETHERTYPE_ID = 0x0812;
+const bit<16> ETHERTYPE_GEO = 0x8947;
+const bit<16> ETHERTYPE_MF = 0x27c0;
+const bit<16> ETHERTYPE_NDN = 0x8624;
+
+const bit<4> TYPE_geo_beacon = 1;
+const bit<4> TYPE_geo_gbc = 4;
 
 const bit<8> IP_PROTO_TCP = 6;
 const bit<8> IP_PROTO_UDP = 17;
@@ -103,6 +108,21 @@ header ipv6_t {
     bit<8>   hop_limit;
     bit<128> src_addr;
     bit<128> dst_addr;
+}
+
+header ipv4_t {
+    bit<4>    version;
+    bit<4>    ihl;
+    bit<8>    diffserv;
+    bit<16>   totalLen;
+    bit<16>   identification;
+    bit<3>    flags;
+    bit<13>   fragOffset;
+    bit<8>    ttl;
+    bit<8>    protocol;
+    bit<16>   hdrChecksum;
+    bit<32>   srcAddr;
+    bit<32>   dstAddr;
 }
 
 header tcp_t {
@@ -150,6 +170,65 @@ header ndp_t {
     bit<48>      target_mac_addr;
 }
 
+// 地理模态报文首部
+header geo_t{
+    bit<4> version;
+    bit<4> nh_basic;
+    bit<8> reserved_basic;
+    bit<8> lt;
+    bit<8> rhl;
+    bit<4> nh_common;
+    bit<4> reserved_common_a;
+    bit<4> ht;  // 决定后续包型
+    bit<4> hst;
+    bit<8> tc;
+    bit<8> flag;
+    bit<16> pl;
+    bit<8> mhl;
+    bit<8> reserved_common_b;
+}
+
+header gbc_t{
+    bit<16> sn;
+    bit<16> reserved_gbc_a;
+    bit<64> gnaddr;
+    bit<32> tst;
+    bit<32> lat;
+    bit<32> longg;
+    bit<1> pai;
+    bit<15> s;
+    bit<16> h;
+    bit<32> geoAreaPosLat; //lat 请求区域中心点的纬度
+    bit<32> geoAreaPosLon; //log 请求区域中心点的经度
+    bit<16> disa;
+    bit<16> disb;
+    bit<16> angle;
+    bit<16> reserved_gbc_b;
+}
+
+
+header beacon_t{
+    bit<64> gnaddr;
+    bit<32> tst;
+    bit<32> lat;
+    bit<32> longg;
+    bit<1> pai;
+    bit<15> s;
+    bit<16> h;
+
+}
+
+header mf_t{
+    bit<32> mf_type;
+    bit<32> src_guid;
+    bit<32> dest_guid;
+}
+
+header id_t {
+    bit<32> srcIdentity;
+    bit<32> dstIdentity;
+}
+
 // Packet-in header. Prepended to packets sent to the CPU_PORT and used by the
 // P4Runtime server (Stratum) to populate the PacketIn message metadata fields.
 // Here we use it to carry the original ingress port where the packet was
@@ -177,6 +256,12 @@ struct parsed_headers_t {
     packet_in_t   packet_in;
     ethernet_t    ethernet;
     ipv6_t        ipv6;
+    ipv4_t        ipv4;
+    id_t          id;
+    mf_t          mf;
+    geo_t         geo;
+    gbc_t         gbc;
+    beacon_t      beacon;
     tcp_t         tcp;
     udp_t         udp;
     icmpv6_t      icmpv6;
@@ -247,7 +332,21 @@ parser ParserImpl (packet_in packet,
     state parse_ethernet {
         packet.extract(hdr.ethernet);
         transition select(hdr.ethernet.ether_type){
+            ETHERTYPE_IPV4: parse_ipv4;
             ETHERTYPE_IPV6: parse_ipv6;
+            ETHERTYPE_ID: parse_id;
+            ETHERTYPE_GEO: parse_geo;
+            ETHERTYPE_MF: parse_mf;
+            ETHERTYPE_NDN: parse_ndn;
+            default: accept;
+        }
+    }
+
+    state parse_ipv4 {
+        packet.extract(hdr.ipv4);
+        transition select(hdr.ipv4.protocol){
+            IP_PROTO_TCP:   parse_tcp;
+            IP_PROTO_UDP:   parse_udp;
             default: accept;
         }
     }
@@ -257,9 +356,45 @@ parser ParserImpl (packet_in packet,
         transition select(hdr.ipv6.next_hdr) {
             IP_PROTO_TCP:    parse_tcp;
             IP_PROTO_UDP:    parse_udp;
-            IP_PROTO_ICMPV6: parse_icmpv6;
             default: accept;
         }
+    }
+
+    // 身份
+    state parse_id {
+        packet.extract(hdr.id);
+        transition accept;
+    }
+
+    // NDN
+    state parse_ndn {
+        transition accept;
+    }
+
+    state parse_mf {
+        packet.extract(hdr.mf);
+        transition accept;
+    }
+
+    // 地理
+    state parse_geo {
+        packet.extract(hdr.geo);
+        transition select(hdr.geo.ht) { //
+            TYPE_geo_beacon: parse_beacon; //0x01
+            TYPE_geo_gbc: parse_gbc; //0x04
+            default: accept;
+        }
+    }
+
+
+    state parse_beacon{
+        packet.extract(hdr.beacon);
+        transition accept;
+    }
+
+    state parse_gbc{
+        packet.extract(hdr.gbc);
+        transition accept;
     }
 
     state parse_tcp {
@@ -278,20 +413,6 @@ parser ParserImpl (packet_in packet,
         // Same here...
         local_metadata.l4_src_port = hdr.udp.src_port;
         local_metadata.l4_dst_port = hdr.udp.dst_port;
-        transition accept;
-    }
-
-    state parse_icmpv6 {
-        packet.extract(hdr.icmpv6);
-        transition select(hdr.icmpv6.type) {
-            ICMP6_TYPE_NS: parse_ndp;
-            ICMP6_TYPE_NA: parse_ndp;
-            default: accept;
-        }
-    }
-
-    state parse_ndp {
-        packet.extract(hdr.ndp);
         transition accept;
     }
 }
@@ -366,8 +487,8 @@ control IngressPipeImpl (inout parsed_headers_t    hdr,
 
     // --- l2_exact_table (for unicast entries) --------------------------------
 
-    action set_egress_port(port_num_t port_num) {
-        standard_metadata.egress_spec = port_num;
+    action set_egress_port(port_num_t dst_port) {
+        standard_metadata.egress_spec = dst_port;
     }
 
     table l2_exact_table {
@@ -426,6 +547,84 @@ control IngressPipeImpl (inout parsed_headers_t    hdr,
     //   switches should be able to use ECMP to distribute traffic via multiple
     //   links.
 
+    // --- routing_id_table ----------------------------------------------------
+    //  身份模态
+    action set_next_id_hop(port_num_t dst_port){
+        standard_metadata.egress_spec = dst_port;
+    }
+
+    table routing_id_table {
+        key = {
+            hdr.id.dstIdentity: exact;
+        }
+        actions = {
+            set_next_id_hop;
+        }
+        @name("routing_id_table_counter")
+        counters = direct_counter(CounterType.packets_and_bytes);
+    }
+
+    // --- routing_mf_table -----------------------------------------------------
+    // mf模态
+    action set_next_mf_hop(port_num_t dst_port) {
+        standard_metadata.egress_spec = dst_port;
+    }
+    table routing_mf_table {
+        key = {
+             hdr.mf.dest_guid : exact;
+        }
+
+        actions = {
+            set_next_mf_hop;
+        }
+
+        @name("routing_mf_table_counter")
+        counters = direct_counter(CounterType.packets_and_bytes);
+    }
+
+    // --- routing_geo_table -----------------------------------------------------
+    // 地理模态
+    action geo_ucast_route(port_num_t dst_port) {
+        standard_metadata.egress_spec = dst_port;
+    }
+    action geo_mcast_route(mcast_group_id_t mgid1) {
+        standard_metadata.mcast_grp = mgid1;
+    }
+    table routing_geo_table {
+        key = {
+            hdr.gbc.geoAreaPosLat: exact;
+            hdr.gbc.geoAreaPosLon: exact;
+            hdr.gbc.disa: exact;
+            hdr.gbc.disb: exact;
+        }
+
+        actions = {
+            geo_ucast_route;
+            geo_mcast_route;
+        }
+
+        @name("routing_geo_table_counter")
+        counters = direct_counter(CounterType.packets_and_bytes);
+    }
+
+    // --- routing_ndn_table ------------------------------------------------------
+    // ndn模态
+    action set_next_ndn_hop(port_num_t dst_port) {
+        standard_metadata.egress_spec = dst_port;
+    }
+    table routing_ndn_table {
+        key = {
+             standard_metadata.ingress_port: exact;
+        }
+
+        actions = {
+            set_next_ndn_hop;
+        }
+
+        @name("routing_ndn_table_counter")
+        counters = direct_counter(CounterType.packets_and_bytes);
+    }
+
     // --- my_station_table ----------------------------------------------------
 
     // Matches on all possible my_station MAC addresses associated with this
@@ -455,7 +654,7 @@ control IngressPipeImpl (inout parsed_headers_t    hdr,
 
     action_selector(HashAlgorithm.crc16, 32w1024, 32w16) ecmp_selector;
 
-    action set_next_hop(mac_addr_t dmac) {
+    action set_next_v6_hop(mac_addr_t dmac) {
         hdr.ethernet.src_addr = hdr.ethernet.dst_addr;
         hdr.ethernet.dst_addr = dmac;
         // Decrement TTL
@@ -476,7 +675,7 @@ control IngressPipeImpl (inout parsed_headers_t    hdr,
           local_metadata.l4_dst_port: selector;
       }
       actions = {
-          set_next_hop;
+          set_next_v6_hop;
       }
       implementation = ecmp_selector;
       @name("routing_v6_table_counter")
@@ -580,8 +779,6 @@ control IngressPipeImpl (inout parsed_headers_t    hdr,
     // are executed sequentially.
 
     apply {
-
-        // If this is a packet-out from the controller...
         if (hdr.packet_out.isValid()) {
             // Set the egress port to that found in the packet-out metadata...
             standard_metadata.egress_spec = hdr.packet_out.egress_port;
@@ -590,48 +787,27 @@ control IngressPipeImpl (inout parsed_headers_t    hdr,
             // Exit the pipeline here, no need to go through other tables.
             exit;
         }
-
-        bool do_l3_l2 = true;
-
-        // *** TODO EXERCISE 4
-        // Fill in the name of the NDP reply table created before
-        // ---- START SOLUTION ----
-        // If this is an NDP NS packet, attempt to generate a reply using the
-        // ndp_reply_table. If a matching entry is found, unset the "do_l3_l2"
-        // flag to skip the L3 and L2 tables, as the "ndp_ns_to_na" action
-        // already set an egress port.
-
-        // Uncomment this block when done.
-        /*
-        if (hdr.icmpv6.isValid() && hdr.icmpv6.type == ICMP6_TYPE_NS) {
-            if (<NAME OF NDP REPLY TABLE>.apply().hit) {
-                do_l3_l2 = false;
-            }
-        }
-        */
-
-        // ---- END SOLUTION ----
-
-        if (do_l3_l2) {
-
+        if (hdr.ethernet.ether_type == ETHERTYPE_ID && hdr.id.isValid()) {
+            routing_id_table.apply();
+        } else if (hdr.ethernet.ether_type == ETHERTYPE_GEO && hdr.geo.isValid()) {
+            routing_geo_table.apply();
+        } else if (hdr.ethernet.ether_type == ETHERTYPE_MF && hdr.mf.isValid()) {
+            routing_mf_table.apply();
+        } else if (hdr.ethernet.ether_type == ETHERTYPE_NDN) {
+            routing_ndn_table.apply();
+        }  else if (hdr.ipv6.isValid() && my_station_table.apply().hit) {
             // Apply the L3 routing table to IPv6 packets, only if the
-            // destination MAC is found in the my_station_table.
-            if (hdr.ipv6.isValid() && my_station_table.apply().hit) {
-                routing_v6_table.apply();
-                // Checl TTL, drop packet if necessary to avoid loops.
-                if(hdr.ipv6.hop_limit == 0) { drop(); }
-            }
-
-            // L2 bridging. Apply the exact table first (for unicast entries)..
-            if (!l2_exact_table.apply().hit) {
-                // If an entry is NOT found, apply the ternary one in case this
-                // is a multicast/broadcast NDP NS packet for another host
-                // attached to this switch.
-                l2_ternary_table.apply();
-            }
+        // destination MAC is found in the my_station_table.
+            routing_v6_table.apply();
+            // Checl TTL, drop packet if necessary to avoid loops.
+            if(hdr.ipv6.hop_limit == 0) { drop(); }
+        } else if (!l2_exact_table.apply().hit) {
+        // L2 bridging. Apply the exact table first (for unicast entries)..
+            // If an entry is NOT found, apply the ternary one in case this
+            // is a multicast/broadcast NDP NS packet for another host
+            // attached to this switch.
+            l2_ternary_table.apply();
         }
-
-        // Lastly, apply the ACL table.
         acl_table.apply();
     }
 }
@@ -666,25 +842,7 @@ control EgressPipeImpl (inout parsed_headers_t hdr,
                         inout local_metadata_t local_metadata,
                         inout standard_metadata_t standard_metadata) {
     apply {
-        // If this is a packet-in to the controller, e.g., if in ingress we
-        // matched on the ACL table with action send/clone_to_cpu...
-        if (standard_metadata.egress_port == CPU_PORT) {
-            // Add packet_in header and set relevant fields, such as the
-            // switch ingress port where the packet was received.
-            hdr.packet_in.setValid();
-            hdr.packet_in.ingress_port = standard_metadata.ingress_port;
-            // Exit the pipeline here.
-            exit;
-        }
-
-        // If this is a multicast packet (flag set by l2_ternary_table), make
-        // sure we are not replicating the packet on the same port where it was
-        // received. This is useful to avoid broadcasting NDP requests on the
-        // ingress port.
-        if (local_metadata.is_multicast == true &&
-              standard_metadata.ingress_port == standard_metadata.egress_port) {
-            mark_to_drop(standard_metadata);
-        }
+        
     }
 }
 
@@ -734,6 +892,11 @@ control DeparserImpl(packet_out packet, in parsed_headers_t hdr) {
     apply {
         packet.emit(hdr.packet_in);
         packet.emit(hdr.ethernet);
+	packet.emit(hdr.mf);
+        packet.emit(hdr.id);
+        packet.emit(hdr.geo);
+	packet.emit(hdr.gbc);
+	packet.emit(hdr.beacon);
         packet.emit(hdr.ipv6);
         packet.emit(hdr.tcp);
         packet.emit(hdr.udp);

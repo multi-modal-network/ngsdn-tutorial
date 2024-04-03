@@ -2,9 +2,9 @@
   "devices": {
     "device:leaf1": {
       "basic": {
-        "managementAddress": "grpc://mininet:50001?device_id=1",
+        "managementAddress": "grpc://127.0.0.1:50001?device_id=1",
         "driver": "stratum-bmv2",
-        "pipeconf": "org.onosproject.ngsdn-tutorial",
+        "pipeconf": "org.onosproject.pipelines.basic",
         "locType": "grid",
         "gridX": 200,
         "gridY": 600
@@ -16,9 +16,9 @@
     },
     "device:leaf2": {
       "basic": {
-        "managementAddress": "grpc://mininet:50002?device_id=1",
+        "managementAddress": "grpc://127.0.0.1:50002?device_id=1",
         "driver": "stratum-bmv2",
-        "pipeconf": "org.onosproject.ngsdn-tutorial",
+        "pipeconf": "org.onosproject.pipelines.basic",
         "locType": "grid",
         "gridX": 800,
         "gridY": 600
@@ -30,9 +30,9 @@
     },
     "device:spine1": {
       "basic": {
-        "managementAddress": "grpc://mininet:50003?device_id=1",
+        "managementAddress": "grpc://127.0.0.1:50003?device_id=1",
         "driver": "stratum-bmv2",
-        "pipeconf": "org.onosproject.ngsdn-tutorial",
+        "pipeconf": "org.onosproject.pipelines.basic",
         "locType": "grid",
         "gridX": 400,
         "gridY": 400
@@ -44,9 +44,9 @@
     },
     "device:spine2": {
       "basic": {
-        "managementAddress": "grpc://mininet:50004?device_id=1",
+        "managementAddress": "grpc://127.0.0.1:50004?device_id=1",
         "driver": "stratum-bmv2",
-        "pipeconf": "org.onosproject.ngsdn-tutorial",
+        "pipeconf": "org.onosproject.pipelines.basic",
         "locType": "grid",
         "gridX": 600,
         "gridY": 400

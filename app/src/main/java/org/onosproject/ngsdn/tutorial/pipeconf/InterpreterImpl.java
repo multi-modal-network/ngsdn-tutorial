@@ -75,8 +75,10 @@ public class InterpreterImpl extends AbstractHandlerBehaviour
                     .put(Criterion.Type.ETH_SRC, "hdr.ethernet.src_addr")
                     .put(Criterion.Type.ETH_TYPE, "hdr.ethernet.ether_type")
                     .put(Criterion.Type.IPV6_DST, "hdr.ipv6.dst_addr")
-                    .put(Criterion.Type.IP_PROTO, "hdr.ipv6.next_hdr")
-                    .put(Criterion.Type.ICMPV6_TYPE, "hdr.icmpv6.type")
+                    .put(Criterion.Type.IP_PROTO, "local_metadata.ip_proto")
+                    .put(Criterion.Type.ICMPV4_TYPE, "local_metadata.icmp_type")
+                    .put(Criterion.Type.ICMPV6_TYPE, "local_metadata.icmp_type")
+                    .put(Criterion.Type.PROTOCOL_INDEPENDENT, "hdr.id.dstIdentity")
                     .build();
 
     /**

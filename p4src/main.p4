@@ -172,73 +172,6 @@ header ndp_t {
     bit<48>      target_mac_addr;
 }
 
-header ndn_tlv_prefix_t {
-    bit<8> code;
-    bit<8> length;
-}
-
-header ndn_prefix_t {
-    bit<8> code;
-    bit<8> len_code;
-    bit<16> length;
-}
-
-header name_component_t {
-    bit<8> code;
-    bit<8> length;
-    // varbit
-    bit<32> value;
-}
-
-struct name_tlv_t {
-    ndn_tlv_prefix_t ndn_tlv_prefix;
-    // 可嵌套多个component
-    name_component_t[MAX_COMPONENTS] components;
-}
-
-header content_type_tlv_t {
-    bit<8> code;
-    bit<8> length;
-    bit<16> value;
-}
-
-header freshness_period_tlv_t {
-    bit<8> code;
-    bit<8> length;
-    bit<16> value;
-}
-
-header final_block_id_tlv_t {
-    bit<8> code;
-    bit<8> length;
-    bit<16> value;
-}
-
-struct metaInfo_tlv_t {
-    ndn_tlv_prefix_t ndn_tlv_prefix;
-    // ContentType TLV
-    content_type_tlv_t content_type_tlv;
-    // FreshnessPeriod TLV
-    freshness_period_tlv_t freshness_period_tlv;
-    // FinalBlockId TLV
-    final_block_id_tlv_t final_block_id_tlv;
-}
-
-header content_tlv_t {
-    bit<8> code;
-    bit<8> length;
-    // varbit
-    bit<16> value;
-}
-
-// ndn模态报文首部
-struct ndn_t {
-    ndn_prefix_t ndn_prefix;
-    name_tlv_t name_tlv;
-    metaInfo_tlv_t metaInfo_tlv;
-    content_tlv_t content_tlv;
-}
-
 // 地理模态报文首部
 header geo_t{
     bit<4> version;
@@ -441,43 +374,6 @@ parser ParserImpl (packet_in packet,
 
     // NDN
     state parse_ndn {
-        packet.extract(hdr.ndn.ndn_prefix);
-        transition parse_ndn_name;
-    }
-
-    state parse_ndn_name {
-        packet.extract(hdr.ndn.name_tlv.ndn_tlv_prefix);
-        local_metadata.name_tlv_length = hdr.ndn.name_tlv.ndn_tlv_prefix.length;
-        transition parse_ndn_name_components;
-    }
-
-    state parse_ndn_name_components {
-        packet.extract(hdr.ndn.name_tlv.components.next);
-        local_metadata.name_tlv_length = local_metadata.name_tlv_length - 2 - hdr.ndn.name_tlv.components.last.length;
-        transition select(local_metadata.name_tlv_length) {
-            0: parse_ndn_metainfo;
-            default: parse_ndn_name_components;
-        }
-    }
-
-    // state parse_ndn_name_components {
-    //     packet.extract(hdr.ndn.name_tlv.components.next);
-    //     transition select(hdr.ndn.name_tlv.components.last.end) {
-    //         1: parse_ndn_metainfo;
-    //         default: parse_ndn_name_components;
-    //     }
-    // }
-
-    state parse_ndn_metainfo {
-        packet.extract(hdr.ndn.metaInfo_tlv.ndn_tlv_prefix);
-        packet.extract(hdr.ndn.metaInfo_tlv.content_type_tlv);
-        packet.extract(hdr.ndn.metaInfo_tlv.freshness_period_tlv);
-        packet.extract(hdr.ndn.metaInfo_tlv.final_block_id_tlv);
-        transition parse_ndn_content;
-    }
-
-    state parse_ndn_content {
-        packet.extract(hdr.ndn.content_tlv);
         transition accept;
     }
 
@@ -1016,8 +912,6 @@ control DeparserImpl(packet_out packet, in parsed_headers_t hdr) {
     apply {
         packet.emit(hdr.packet_in);
         packet.emit(hdr.ethernet);
-        packet.emit(hdr.ndn);
-	    packet.emit(hdr.mf);
         packet.emit(hdr.id);
         packet.emit(hdr.geo);
 	    packet.emit(hdr.gbc);

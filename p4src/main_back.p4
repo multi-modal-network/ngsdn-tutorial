@@ -796,17 +796,24 @@ control IngressPipeImpl (inout parsed_headers_t    hdr,
             routing_ndn_table.apply();
         }  else if (hdr.ipv6.isValid() && my_station_table.apply().hit) {
             // Apply the L3 routing table to IPv6 packets, only if the
-        // destination MAC is found in the my_station_table.
-            routing_v6_table.apply();
-            // Checl TTL, drop packet if necessary to avoid loops.
-            if(hdr.ipv6.hop_limit == 0) { drop(); }
-        } else if (!l2_exact_table.apply().hit) {
-        // L2 bridging. Apply the exact table first (for unicast entries)..
-            // If an entry is NOT found, apply the ternary one in case this
-            // is a multicast/broadcast NDP NS packet for another host
-            // attached to this switch.
-            l2_ternary_table.apply();
+            // destination MAC is found in the my_station_table.
+            if (hdr.ipv6.isValid() && my_station_table.apply().hit) {
+                routing_v6_table.apply();
+                // Checl TTL, drop packet if necessary to avoid loops.
+                if(hdr.ipv6.hop_limit == 0) { drop(); }
+            }
+
+            // L2 bridging. Apply the exact table first (for unicast entries)..
+            if (!l2_exact_table.apply().hit) {
+                // If an entry is NOT found, apply the ternary one in case this
+                // is a multicast/broadcast NDP NS packet for another host
+                // attached to this switch.
+                l2_ternary_table.apply();
+            }
         }
+
+        // Lastly, apply the ACL table.
+        acl_table.apply();
     }
 }
 

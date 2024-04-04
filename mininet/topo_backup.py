@@ -26,10 +26,10 @@ from stratum import StratumBmv2Switch
 CPU_PORT = 255
 
 
-class ONOSHost(Host):
+class IPv6Host(Host):
 
-    def config(self, ipv6, ipv6_gw=None, identity=None, guid=None, geoPosLat=None, geoPosLon=None, disa=None, disb=None, ndn_name=None, ndn_content=None, **params):
-        super(ONOSHost, self).config(**params)
+    def config(self, ipv6, ipv6_gw=None, identity=None, **params):
+        super(IPv6Host, self).config(**params)
         self.cmd('ip -4 addr flush dev %s' % self.defaultIntf())
         self.cmd('ip -6 addr flush dev %s' % self.defaultIntf())
         self.cmd('ip -6 addr add %s dev %s' % (ipv6, self.defaultIntf()))
@@ -48,18 +48,11 @@ class ONOSHost(Host):
             return int(leaf,2)
 
         self.identity = identity
-        self.guid = guid
-        self.geoPosLat = geoPosLat
-        self.geoPosLon = geoPosLon
-        self.disa = disa
-        self.disb = disb
-        self.ndn_name = ndn_name
-        self.ndn_content = ndn_content
 
         self.defaultIntf().updateIP = updateIP
 
     def terminate(self):
-        super(ONOSHost, self).terminate()
+        super(IPv6Host, self).terminate()
 
 
 class TutorialTopo(Topo):
@@ -87,19 +80,13 @@ class TutorialTopo(Topo):
         self.addLink(spine2, leaf2)
 
         # IPv6 hosts attached to leaf 1
-        h1a = self.addHost('h1a', cls=ONOSHost, mac="00:00:00:00:00:1A",
-                           ipv6='2001:1:1::a/64', ipv6_gw='2001:1:1::ff',identity=202271789,guid = 1,
-                                geoPosLat = -180,
-                                geoPosLon = -90,
-                                disa = 0,
-                                disb = 0,
-                                ndn_name = "2022717{}".format(60),
-                                ndn_content = 2048)
-        h1b = self.addHost('h1b', cls=ONOSHost, mac="00:00:00:00:00:1B",
+        h1a = self.addHost('h1a', cls=IPv6Host, mac="00:00:00:00:00:1A",
+                           ipv6='2001:1:1::a/64', ipv6_gw='2001:1:1::ff',identity=202271789)
+        h1b = self.addHost('h1b', cls=IPv6Host, mac="00:00:00:00:00:1B",
                            ipv6='2001:1:1::b/64', ipv6_gw='2001:1:1::ff',identity=201814860)
-        h1c = self.addHost('h1c', cls=ONOSHost, mac="00:00:00:00:00:1C",
+        h1c = self.addHost('h1c', cls=IPv6Host, mac="00:00:00:00:00:1C",
                            ipv6='2001:1:1::c/64', ipv6_gw='2001:1:1::ff',identity=202271790)
-        h2 = self.addHost('h2', cls=ONOSHost, mac="00:00:00:00:00:20",
+        h2 = self.addHost('h2', cls=IPv6Host, mac="00:00:00:00:00:20",
                           ipv6='2001:1:2::1/64', ipv6_gw='2001:1:2::ff',identity=202271770)
         self.addLink(h1a, leaf1)  # port 3
         self.addLink(h1b, leaf1)  # port 4
@@ -107,9 +94,9 @@ class TutorialTopo(Topo):
         self.addLink(h2, leaf1)  # port 6
 
         # IPv6 hosts attached to leaf 2
-        h3 = self.addHost('h3', cls=ONOSHost, mac="00:00:00:00:00:30",
+        h3 = self.addHost('h3', cls=IPv6Host, mac="00:00:00:00:00:30",
                           ipv6='2001:2:3::1/64', ipv6_gw='2001:2:3::ff',identity=202271791)
-        h4 = self.addHost('h4', cls=ONOSHost, mac="00:00:00:00:00:40",
+        h4 = self.addHost('h4', cls=IPv6Host, mac="00:00:00:00:00:40",
                           ipv6='2001:2:4::1/64', ipv6_gw='2001:2:4::ff',identity=202271792)
         self.addLink(h3, leaf2)  # port 3
         self.addLink(h4, leaf2)  # port 4

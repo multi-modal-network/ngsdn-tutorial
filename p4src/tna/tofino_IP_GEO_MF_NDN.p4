@@ -32,6 +32,7 @@
 struct metadata_t {
     bit<1>   l3;    // Set if routed
     bit<1>   ndn;    // Set if routed
+    bit<8>   name_tlv_length;
 }
 
 // ---------------------------------------------------------------------------
@@ -58,30 +59,79 @@ parser SwitchIngressParser(
             ETHERTYPE_GEO  : parse_geo;
             ETHERTYPE_MF   : parse_mf;
             ETHERTYPE_NDN  : parse_ndn;
+            ETHERTYPE_ID   : parse_id;
             default : accept;
         }
 
     }
 
+    // IPv4
     state parse_ipv4 {
         pkt.extract(hdr.ipv4);
         transition accept;
     }
 
+    // NDN
     state parse_ndn {
-    transition accept;
+        pkt.extract(hdr.ndn.ndn_prefix);
+        transition parse_ndn_name;
     }
 
+    state parse_ndn_name {
+        pkt.extract(hdr.ndn.name_tlv.ndn_tlv_prefix);
+        ig_md.name_tlv_length = hdr.ndn.name_tlv.ndn_tlv_prefix.length;
+        transition parse_ndn_name_components;
+    }
+
+    // state parse_ndn_name_components {
+    //     pkt.extract(hdr.ndn.name_tlv.components.next);
+    //     //ig_md.name_tlv_length = ig_md.name_tlv_length - 2 - hdr.ndn.name_tlv.components.last.length;
+    //     transition select(ig_md.name_tlv_length) {
+    //         0: parse_ndn_metainfo;
+    //         default: parse_ndn_name_components;
+    //     }
+    // }
+
+    state parse_ndn_name_components {
+        pkt.extract(hdr.ndn.name_tlv.components.next);
+        transition select(hdr.ndn.name_tlv.components.last.end) {
+            0: parse_ndn_name_components;
+            1: parse_ndn_metainfo;
+        }
+    }
+
+    state parse_ndn_metainfo {
+        pkt.extract(hdr.ndn.metaInfo_tlv.ndn_tlv_prefix);
+        pkt.extract(hdr.ndn.metaInfo_tlv.content_type_tlv);
+        pkt.extract(hdr.ndn.metaInfo_tlv.freshness_period_tlv);
+        pkt.extract(hdr.ndn.metaInfo_tlv.final_block_id_tlv);
+        transition parse_ndn_content;
+    }
+
+    state parse_ndn_content {
+        pkt.extract(hdr.ndn.content_tlv);
+        transition accept;
+    }
+
+    // ID
+    state parse_id {
+        pkt.extract(hdr.id);
+        transition accept;
+    }
+
+    // IPv6
     state parse_ipv6 {
         pkt.extract(hdr.ipv6);
         transition accept;
     }
 
+    // MF
     state parse_mf {
         pkt.extract(hdr.mf_guid);
         transition accept;
     }
 
+    // GEO
     state parse_geo {
         pkt.extract(hdr.geo);
         transition select(hdr.geo.ht) { //
@@ -128,8 +178,8 @@ control SwitchIngressDeparser(
             hdr.ipv4.frag_offset,
             hdr.ipv4.ttl,
             hdr.ipv4.protocol,
-            hdr.ipv4.src_addr,
-            hdr.ipv4.dst_addr});
+            hdr.ipv4.srcAddr,
+            hdr.ipv4.dstAddr});
 
         pkt.emit(hdr);
     }
@@ -138,7 +188,7 @@ control SwitchIngressDeparser(
 // ---------------------------------------------------------------------------
 // Switch Ingress MAU
 // ---------------------------------------------------------------------------
-control SwitchIngress(
+control ingress(
         inout header_t hdr,
         inout metadata_t ig_md,
         in ingress_intrinsic_metadata_t ig_intr_md,
@@ -150,8 +200,9 @@ control SwitchIngress(
     DirectCounter<bit<32>>(CounterType_t.PACKETS_AND_BYTES) l2_counter;
     DirectCounter<bit<32>>(CounterType_t.PACKETS_AND_BYTES) ipv4_counter;
     DirectCounter<bit<32>>(CounterType_t.PACKETS_AND_BYTES) ipv6_counter;
-    DirectCounter<bit<32>>(CounterType_t.PACKETS_AND_BYTES) mf_counter;
+
     DirectCounter<bit<32>>(CounterType_t.PACKETS_AND_BYTES) geo_counter;
+    DirectCounter<bit<32>>(CounterType_t.PACKETS_AND_BYTES) mf_counter;
     DirectCounter<bit<32>>(CounterType_t.PACKETS_AND_BYTES) ndn_counter;
     // Create indirect counter
     // Counter<bit<32>, ether_type_t>(
@@ -200,21 +251,17 @@ control SwitchIngress(
     }
 
 
-    action ipv4_ucast_route(mac_addr_t srcMac, mac_addr_t dstMac, PortId_t dst_port) {
+    action set_next_v4_hop(PortId_t dst_port) {
         ig_tm_md.ucast_egress_port = dst_port;
-        hdr.ethernet.dst_addr = dstMac;
-        hdr.ethernet.src_addr = srcMac;
-        hdr.ipv4.ttl = hdr.ipv4.ttl - 1;
         ipv4_counter.count();
     }
-    table ing_ipv4_route {
+    table routing_v4_table {
         key = {
-            hdr.ipv4.src_addr : ternary;
-            hdr.ipv4.dst_addr : ternary;
+            hdr.ipv4.dstAddr : exact;
         }
 
         actions = {
-            ipv4_ucast_route;
+            set_next_v4_hop;
         }
 
         counters = ipv4_counter;
@@ -223,45 +270,26 @@ control SwitchIngress(
 
 
 
-   action ipv6_ucast_route(mac_addr_t srcMac, mac_addr_t dstMac, PortId_t dst_port) {
+   action set_next_v6_hop(PortId_t dst_port) {
         ig_tm_md.ucast_egress_port = dst_port;
-        hdr.ethernet.dst_addr = dstMac;
-        hdr.ethernet.src_addr = srcMac;
         ipv6_counter.count();
     }
-    table ing_ipv6_route {
+    table routing_v6_table {
         key = {
-            hdr.ipv6.src_addr : ternary;
-            hdr.ipv6.dst_addr : ternary;
+            hdr.ipv6.dst_addr : exact;
         }
 
         actions = {
-            ipv6_ucast_route;
+            set_next_v6_hop;
         }
 
         counters = ipv6_counter;
         size = 1024;
     }
 
-   action mf_ucast_route(PortId_t dst_port) {
-        ig_tm_md.ucast_egress_port = dst_port;
-        mf_counter.count();
-    }
-    table ing_mf_route {
-        key = {
-             hdr.mf_guid.dest_guid : exact;
-        }
-
-        actions = {
-            mf_ucast_route;
-        }
-
-        counters = mf_counter;
-        size = 1024;
-    }
 
 
-
+    // GEO
     action geo_ucast_route(PortId_t dst_port) {
         ig_tm_md.ucast_egress_port = dst_port;
         geo_counter.count();
@@ -270,7 +298,7 @@ control SwitchIngress(
         ig_tm_md.mcast_grp_a = mgid1;
         geo_counter.count();
     }
-    table ing_geo_route {
+    table routing_geo_table {
         key = {
             hdr.gbc.geoAreaPosLat: exact;
             hdr.gbc.geoAreaPosLon: exact;
@@ -287,17 +315,38 @@ control SwitchIngress(
         size = 1024;
     }
 
-   action ndn_ucast_route(PortId_t dst_port) {
+    // MF
+    action set_next_mf_hop(PortId_t dst_port) {
         ig_tm_md.ucast_egress_port = dst_port;
-        ndn_counter.count();
+        mf_counter.count();
     }
-    table ing_ndn_route {
+    table routing_mf_table {
         key = {
-             ig_intr_md.ingress_port: exact;
+            hdr.mf_guid.dest_guid: exact;
         }
 
         actions = {
-            ndn_ucast_route;
+            set_next_mf_hop;
+        }
+
+        counters = mf_counter;
+        size = 1024;
+    }
+
+    // NDN
+    action set_next_ndn_hop(PortId_t dst_port) {
+        ig_tm_md.ucast_egress_port = dst_port;
+        ndn_counter.count();
+    }
+    table routing_ndn_table {
+        key = {
+            hdr.ndn.ndn_prefix.code: exact;
+            hdr.ndn.name_tlv.components[0].value: exact;
+            hdr.ndn.content_tlv.value: exact;
+        }
+
+        actions = {
+            set_next_ndn_hop;
         }
 
         counters = ndn_counter;
@@ -308,30 +357,22 @@ control SwitchIngress(
             ing_dmac.apply();
             if (ig_md.l3 == 1)
             {
-                if(hdr.ethernet.ether_type == ETHERTYPE_IPV4)
-                {
-                    ing_ipv4_route.apply();
+                if(hdr.ethernet.ether_type == ETHERTYPE_IPV4){
+                    routing_v4_table.apply();
                 }
-                if(hdr.ethernet.ether_type == ETHERTYPE_IPV6)
-                {
-                    ing_ipv6_route.apply();
+                if(hdr.ethernet.ether_type == ETHERTYPE_IPV6){
+                    routing_v6_table.apply();
                 }
-                if (hdr.ethernet.ether_type == ETHERTYPE_GEO)
-                {
-                    if (hdr.gbc.isValid())         
-                        {
-                            ing_geo_route.apply();
-                        } ;
-                }
-                if (hdr.ethernet.ether_type == ETHERTYPE_MF)
-                    {
-                        ing_mf_route.apply();
-                    }
-                if (hdr.ethernet.ether_type == ETHERTYPE_NDN)
-                    {
-                        ing_ndn_route.apply();
-                    }
 
+                if(hdr.ethernet.ether_type == ETHERTYPE_GEO) {
+                    routing_geo_table.apply();
+                }
+                if(hdr.ethernet.ether_type == ETHERTYPE_MF) {
+                    routing_mf_table.apply();
+                }
+                if(hdr.ethernet.ether_type == ETHERTYPE_NDN) {
+                    routing_ndn_table.apply();
+                }
             }
             
 
@@ -341,7 +382,7 @@ control SwitchIngress(
 }
 
 Pipeline(SwitchIngressParser(),
-         SwitchIngress(),
+         ingress(),
          SwitchIngressDeparser(),
          EmptyEgressParser(),
          EmptyEgress(),

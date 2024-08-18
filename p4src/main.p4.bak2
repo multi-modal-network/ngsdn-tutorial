@@ -50,6 +50,8 @@
 // CPU_PORT.
 #define CPU_CLONE_SESSION_ID 99
 
+#define MAX_COMPONENTS 8
+
 
 //------------------------------------------------------------------------------
 // TYPEDEF DECLARATIONS
@@ -170,6 +172,72 @@ header ndp_t {
     bit<48>      target_mac_addr;
 }
 
+header ndn_tlv_prefix_t {
+    bit<8> code;
+    bit<8> length;
+}
+
+header ndn_prefix_t {
+    bit<8> code;
+    bit<8> len_code;
+    bit<16> length;
+}
+
+header name_component_t {
+    bit<8> length;
+    // varbit
+    bit<64> value;
+}
+
+struct name_tlv_t {
+    ndn_tlv_prefix_t ndn_tlv_prefix;
+    // 可嵌套多个component
+    name_component_t[MAX_COMPONENTS] components;
+}
+
+header content_type_tlv_t {
+    bit<8> code;
+    bit<8> length;
+    bit<16> value;
+}
+
+header freshness_period_tlv_t {
+    bit<8> code;
+    bit<8> length;
+    bit<16> value;
+}
+
+header final_block_id_tlv_t {
+    bit<8> code;
+    bit<8> length;
+    bit<16> value;
+}
+
+struct metaInfo_tlv_t {
+    ndn_tlv_prefix_t ndn_tlv_prefix;
+    // ContentType TLV
+    content_type_tlv_t content_type_tlv;
+    // FreshnessPeriod TLV
+    freshness_period_tlv_t freshness_period_tlv;
+    // FinalBlockId TLV
+    final_block_id_tlv_t final_block_id_tlv;
+}
+
+header content_tlv_t {
+    bit<8> code;
+    bit<8> length;
+    // varbit
+    bit<64> value;
+}
+
+// ndn模态报文首部
+struct ndn_t {
+    ndn_prefix_t ndn_prefix;
+    name_tlv_t name_tlv;
+    metaInfo_tlv_t metaInfo_tlv;
+    content_tlv_t content_tlv;
+}
+
 // 地理模态报文首部
 header geo_t{
     bit<4> version;
@@ -218,12 +286,14 @@ header beacon_t{
 
 }
 
+// mf模态报文首部
 header mf_t{
     bit<32> mf_type;
     bit<32> src_guid;
     bit<32> dest_guid;
 }
 
+// 身份模态报文首部
 header id_t {
     bit<32> srcIdentity;
     bit<32> dstIdentity;
@@ -262,6 +332,7 @@ struct parsed_headers_t {
     geo_t         geo;
     gbc_t         gbc;
     beacon_t      beacon;
+    ndn_t         ndn;
     tcp_t         tcp;
     udp_t         udp;
     icmpv6_t      icmpv6;
@@ -276,6 +347,7 @@ struct parsed_headers_t {
 struct local_metadata_t {
     l4_port_t  l4_src_port;
     l4_port_t  l4_dst_port;
+    bit<8>     name_tlv_length;
     bool       is_multicast;
 }
 
@@ -368,6 +440,35 @@ parser ParserImpl (packet_in packet,
 
     // NDN
     state parse_ndn {
+        packet.extract(hdr.ndn.ndn_prefix);
+        transition parse_ndn_name;
+    }
+
+    state parse_ndn_name {
+        packet.extract(hdr.ndn.name_tlv.ndn_tlv_prefix);
+        local_metadata.name_tlv_length = hdr.ndn.name_tlv.ndn_tlv_prefix.length;
+        transition parse_ndn_name_components;
+    }
+
+    state parse_ndn_name_components {
+        packet.extract(hdr.ndn.name_tlv.components.next);
+        local_metadata.name_tlv_length = local_metadata.name_tlv_length - 2 - hdr.ndn.name_tlv.components.last.length;
+        transition select(local_metadata.name_tlv_length) {
+            0: parse_ndn_metainfo;
+            default: parse_ndn_name_components;
+        }
+    }
+
+    state parse_ndn_metainfo {
+        packet.extract(hdr.ndn.metaInfo_tlv.ndn_tlv_prefix);
+        packet.extract(hdr.ndn.metaInfo_tlv.content_type_tlv);
+        packet.extract(hdr.ndn.metaInfo_tlv.freshness_period_tlv);
+        packet.extract(hdr.ndn.metaInfo_tlv.final_block_id_tlv);
+        transition parse_ndn_content;
+    }
+
+    state parse_ndn_content {
+        packet.extract(hdr.ndn.content_tlv);
         transition accept;
     }
 
@@ -553,13 +654,22 @@ control IngressPipeImpl (inout parsed_headers_t    hdr,
         standard_metadata.egress_spec = dst_port;
     }
 
+
+    action to_cpu() {
+        standard_metadata.egress_spec = CPU_PORT;
+        hdr.packet_in.ingress_port = standard_metadata.ingress_port;
+        hdr.packet_in.setValid();
+    }
+
     table routing_id_table {
         key = {
             hdr.id.dstIdentity: exact;
         }
         actions = {
             set_next_id_hop;
+            to_cpu;
         }
+        default_action = to_cpu;
         @name("routing_id_table_counter")
         counters = direct_counter(CounterType.packets_and_bytes);
     }
@@ -576,8 +686,9 @@ control IngressPipeImpl (inout parsed_headers_t    hdr,
 
         actions = {
             set_next_mf_hop;
+            to_cpu;
         }
-
+        default_action = to_cpu;
         @name("routing_mf_table_counter")
         counters = direct_counter(CounterType.packets_and_bytes);
     }
@@ -601,8 +712,9 @@ control IngressPipeImpl (inout parsed_headers_t    hdr,
         actions = {
             geo_ucast_route;
             geo_mcast_route;
+            to_cpu;
         }
-
+        default_action = to_cpu;
         @name("routing_geo_table_counter")
         counters = direct_counter(CounterType.packets_and_bytes);
     }
@@ -614,13 +726,16 @@ control IngressPipeImpl (inout parsed_headers_t    hdr,
     }
     table routing_ndn_table {
         key = {
-             standard_metadata.ingress_port: exact;
+            hdr.ndn.ndn_prefix.code: exact;
+            hdr.ndn.name_tlv.components[0].value: exact;
+            hdr.ndn.content_tlv.value: exact;
         }
 
         actions = {
             set_next_ndn_hop;
+            to_cpu;
         }
-
+        default_action = to_cpu;
         @name("routing_ndn_table_counter")
         counters = direct_counter(CounterType.packets_and_bytes);
     }
@@ -632,6 +747,7 @@ control IngressPipeImpl (inout parsed_headers_t    hdr,
     // packet. Later in the apply block, we define logic such that packets are
     // routed if and only if this table is "hit", i.e. a matching entry is found
     // for the given packet.
+
     table my_station_table {
         key = {
             hdr.ethernet.dst_addr: exact;
@@ -796,23 +912,17 @@ control IngressPipeImpl (inout parsed_headers_t    hdr,
             routing_ndn_table.apply();
         }  else if (hdr.ipv6.isValid() && my_station_table.apply().hit) {
             // Apply the L3 routing table to IPv6 packets, only if the
-            // destination MAC is found in the my_station_table.
-            if (hdr.ipv6.isValid() && my_station_table.apply().hit) {
-                routing_v6_table.apply();
-                // Checl TTL, drop packet if necessary to avoid loops.
-                if(hdr.ipv6.hop_limit == 0) { drop(); }
-            }
-
-            // L2 bridging. Apply the exact table first (for unicast entries)..
-            if (!l2_exact_table.apply().hit) {
-                // If an entry is NOT found, apply the ternary one in case this
-                // is a multicast/broadcast NDP NS packet for another host
-                // attached to this switch.
-                l2_ternary_table.apply();
-            }
+        // destination MAC is found in the my_station_table.
+            routing_v6_table.apply();
+            // Checl TTL, drop packet if necessary to avoid loops.
+            if(hdr.ipv6.hop_limit == 0) { drop(); }
+        } else if (!l2_exact_table.apply().hit) {
+        // L2 bridging. Apply the exact table first (for unicast entries)..
+            // If an entry is NOT found, apply the ternary one in case this
+            // is a multicast/broadcast NDP NS packet for another host
+            // attached to this switch.
+            l2_ternary_table.apply();
         }
-
-        // Lastly, apply the ACL table.
         acl_table.apply();
     }
 }
@@ -897,11 +1007,11 @@ control DeparserImpl(packet_out packet, in parsed_headers_t hdr) {
     apply {
         packet.emit(hdr.packet_in);
         packet.emit(hdr.ethernet);
-	packet.emit(hdr.mf);
+	    packet.emit(hdr.mf);
         packet.emit(hdr.id);
         packet.emit(hdr.geo);
-	packet.emit(hdr.gbc);
-	packet.emit(hdr.beacon);
+	    packet.emit(hdr.gbc);
+	    packet.emit(hdr.beacon);
         packet.emit(hdr.ipv6);
         packet.emit(hdr.tcp);
         packet.emit(hdr.udp);

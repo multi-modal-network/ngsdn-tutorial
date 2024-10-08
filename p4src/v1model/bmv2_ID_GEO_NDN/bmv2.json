@@ -10,6 +10,7 @@
         ["port_meters_ingress_ingress_color", 8, false],
         ["host_meter_control_meter_tag", 8, false],
         ["key_0", 32, false],
+        ["key_1", 32, false],
         ["tmp_2", 32, false],
         ["tmp_3", 32, false],
         ["port_meters_egress_egress_color", 8, false],
@@ -528,7 +529,7 @@
       "name" : "fl",
       "source_info" : {
         "filename" : "p4src/v1model/bmv2_ID_GEO_NDN.p4",
-        "line" : 226,
+        "line" : 231,
         "column" : 34,
         "source_fragment" : "{ standard_metadata.ingress_port }"
       },
@@ -1185,7 +1186,7 @@
       "id" : 0,
       "source_info" : {
         "filename" : "p4src/v1model/bmv2_ID_GEO_NDN.p4",
-        "line" : 155,
+        "line" : 157,
         "column" : 8,
         "source_fragment" : "counters"
       },
@@ -1197,7 +1198,7 @@
       "id" : 1,
       "source_info" : {
         "filename" : "p4src/v1model/bmv2_ID_GEO_NDN.p4",
-        "line" : 181,
+        "line" : 184,
         "column" : 8,
         "source_fragment" : "counters"
       },
@@ -1209,7 +1210,7 @@
       "id" : 2,
       "source_info" : {
         "filename" : "p4src/v1model/bmv2_ID_GEO_NDN.p4",
-        "line" : 202,
+        "line" : 207,
         "column" : 8,
         "source_fragment" : "counters"
       },
@@ -1245,7 +1246,7 @@
       "id" : 5,
       "source_info" : {
         "filename" : "p4src/v1model/bmv2_ID_GEO_NDN.p4",
-        "line" : 246,
+        "line" : 251,
         "column" : 8,
         "source_fragment" : "counters"
       },
@@ -1871,7 +1872,7 @@
           ],
           "source_info" : {
             "filename" : "p4src/v1model/bmv2_ID_GEO_NDN.p4",
-            "line" : 161,
+            "line" : 163,
             "column" : 8,
             "source_fragment" : "standard_metadata.egress_spec = dst_port"
           }
@@ -1902,7 +1903,7 @@
           ],
           "source_info" : {
             "filename" : "p4src/v1model/bmv2_ID_GEO_NDN.p4",
-            "line" : 164,
+            "line" : 166,
             "column" : 8,
             "source_fragment" : "standard_metadata.mcast_grp = mgid1"
           }
@@ -1933,7 +1934,7 @@
           ],
           "source_info" : {
             "filename" : "p4src/v1model/bmv2_ID_GEO_NDN.p4",
-            "line" : 187,
+            "line" : 190,
             "column" : 8,
             "source_fragment" : "standard_metadata.egress_spec = dst_port"
           }
@@ -1959,7 +1960,7 @@
           ],
           "source_info" : {
             "filename" : "p4src/v1model/bmv2_ID_GEO_NDN.p4",
-            "line" : 218,
+            "line" : 223,
             "column" : 8,
             "source_fragment" : "standard_metadata.egress_spec = 255"
           }
@@ -1985,7 +1986,7 @@
           ],
           "source_info" : {
             "filename" : "p4src/v1model/bmv2_ID_GEO_NDN.p4",
-            "line" : 226,
+            "line" : 231,
             "column" : 8,
             "source_fragment" : "clone3(CloneType.I2E, 99, { standard_metadata.ingress_port })"
           }
@@ -2245,7 +2246,7 @@
           ],
           "source_info" : {
             "filename" : "p4src/v1model/bmv2_ID_GEO_NDN.p4",
-            "line" : 282,
+            "line" : 287,
             "column" : 12,
             "source_fragment" : "standard_metadata.egress_spec = hdr.packet_out.egress_port"
           }
@@ -2260,7 +2261,7 @@
           ],
           "source_info" : {
             "filename" : "p4src/v1model/bmv2_ID_GEO_NDN.p4",
-            "line" : 284,
+            "line" : 289,
             "column" : 12,
             "source_fragment" : "hdr.packet_out.setInvalid()"
           }
@@ -2270,7 +2271,7 @@
           "parameters" : [],
           "source_info" : {
             "filename" : "p4src/v1model/bmv2_ID_GEO_NDN.p4",
-            "line" : 286,
+            "line" : 291,
             "column" : 12,
             "source_fragment" : "exit"
           }
@@ -2296,9 +2297,28 @@
           ],
           "source_info" : {
             "filename" : "p4src/v1model/bmv2_ID_GEO_NDN.p4",
-            "line" : 192,
+            "line" : 196,
             "column" : 12,
             "source_fragment" : "hdr.ndn.name_tlv.components[0].value"
+          }
+        },
+        {
+          "op" : "assign",
+          "parameters" : [
+            {
+              "type" : "field",
+              "value" : ["scalars", "key_1"]
+            },
+            {
+              "type" : "field",
+              "value" : ["_ndn_name_tlv_components12[1]", "value"]
+            }
+          ],
+          "source_info" : {
+            "filename" : "p4src/v1model/bmv2_ID_GEO_NDN.p4",
+            "line" : 197,
+            "column" : 12,
+            "source_fragment" : "hdr.ndn.name_tlv.components[1].value"
           }
         }
       ]
@@ -2826,7 +2846,7 @@
           "id" : 7,
           "source_info" : {
             "filename" : "p4src/v1model/bmv2_ID_GEO_NDN.p4",
-            "line" : 282,
+            "line" : 287,
             "column" : 42,
             "source_fragment" : "= hdr.packet_out.egress_port; ..."
           },
@@ -2862,6 +2882,18 @@
           "key" : [
             {
               "match_type" : "exact",
+              "name" : "hdr.ethernet.ether_type",
+              "target" : ["_ethernet2", "ether_type"],
+              "mask" : null
+            },
+            {
+              "match_type" : "exact",
+              "name" : "hdr.id.srcIdentity",
+              "target" : ["_id5", "srcIdentity"],
+              "mask" : null
+            },
+            {
+              "match_type" : "exact",
               "name" : "hdr.id.dstIdentity",
               "target" : ["_id5", "dstIdentity"],
               "mask" : null
@@ -2892,11 +2924,17 @@
           "id" : 9,
           "source_info" : {
             "filename" : "p4src/v1model/bmv2_ID_GEO_NDN.p4",
-            "line" : 166,
+            "line" : 168,
             "column" : 10,
             "source_fragment" : "routing_geo_table"
           },
           "key" : [
+            {
+              "match_type" : "exact",
+              "name" : "hdr.ethernet.ether_type",
+              "target" : ["_ethernet2", "ether_type"],
+              "mask" : null
+            },
             {
               "match_type" : "exact",
               "name" : "hdr.gbc.geoAreaPosLat",
@@ -2948,9 +2986,9 @@
           "id" : 10,
           "source_info" : {
             "filename" : "p4src/v1model/bmv2_ID_GEO_NDN.p4",
-            "line" : 192,
+            "line" : 196,
             "column" : 12,
-            "source_fragment" : "hdr.ndn.name_tlv.components[0].value"
+            "source_fragment" : "hdr.ndn.name_tlv.components[0].value: exact; ..."
           },
           "key" : [],
           "match_type" : "exact",
@@ -2977,11 +3015,17 @@
           "id" : 11,
           "source_info" : {
             "filename" : "p4src/v1model/bmv2_ID_GEO_NDN.p4",
-            "line" : 189,
+            "line" : 192,
             "column" : 10,
             "source_fragment" : "routing_ndn_table"
           },
           "key" : [
+            {
+              "match_type" : "exact",
+              "name" : "hdr.ethernet.ether_type",
+              "target" : ["_ethernet2", "ether_type"],
+              "mask" : null
+            },
             {
               "match_type" : "exact",
               "name" : "hdr.ndn.ndn_prefix.code",
@@ -2992,6 +3036,12 @@
               "match_type" : "exact",
               "name" : "hdr.ndn.name_tlv.components[0].value",
               "target" : ["scalars", "key_0"],
+              "mask" : null
+            },
+            {
+              "match_type" : "exact",
+              "name" : "hdr.ndn.name_tlv.components[1].value",
+              "target" : ["scalars", "key_1"],
               "mask" : null
             },
             {
@@ -3146,7 +3196,7 @@
           "id" : 16,
           "source_info" : {
             "filename" : "p4src/v1model/bmv2_ID_GEO_NDN.p4",
-            "line" : 229,
+            "line" : 234,
             "column" : 10,
             "source_fragment" : "acl_table"
           },
@@ -3308,7 +3358,7 @@
           "id" : 3,
           "source_info" : {
             "filename" : "p4src/v1model/bmv2_ID_GEO_NDN.p4",
-            "line" : 280,
+            "line" : 285,
             "column" : 12,
             "source_fragment" : "hdr.packet_out.isValid()"
           },
@@ -3331,7 +3381,7 @@
           "id" : 4,
           "source_info" : {
             "filename" : "p4src/v1model/bmv2_ID_GEO_NDN.p4",
-            "line" : 288,
+            "line" : 293,
             "column" : 12,
             "source_fragment" : "hdr.ethernet.ether_type == ETHERTYPE_ID && hdr.id.isValid()"
           },
@@ -3374,7 +3424,7 @@
           "id" : 5,
           "source_info" : {
             "filename" : "p4src/v1model/bmv2_ID_GEO_NDN.p4",
-            "line" : 290,
+            "line" : 295,
             "column" : 19,
             "source_fragment" : "hdr.ethernet.ether_type == ETHERTYPE_GEO && hdr.geo.isValid()"
           },
@@ -3417,7 +3467,7 @@
           "id" : 6,
           "source_info" : {
             "filename" : "p4src/v1model/bmv2_ID_GEO_NDN.p4",
-            "line" : 292,
+            "line" : 297,
             "column" : 18,
             "source_fragment" : "hdr.ethernet.ether_type == ETHERTYPE_NDN"
           },
@@ -3443,7 +3493,7 @@
           "id" : 7,
           "source_info" : {
             "filename" : "p4src/v1model/bmv2_ID_GEO_NDN.p4",
-            "line" : 294,
+            "line" : 299,
             "column" : 19,
             "source_fragment" : "!l2_exact_table.apply().hit"
           },
@@ -3475,7 +3525,7 @@
       "id" : 1,
       "source_info" : {
         "filename" : "p4src/v1model/bmv2_ID_GEO_NDN.p4",
-        "line" : 309,
+        "line" : 314,
         "column" : 8,
         "source_fragment" : "egress"
       },

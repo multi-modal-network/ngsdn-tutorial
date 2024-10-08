@@ -143,7 +143,9 @@ control ingress(inout headers_t hdr,
     }
     table routing_mf_table {
         key = {
-             hdr.mf.dest_guid : exact;
+            hdr.ethernet.ether_type: exact;
+            hdr.mf.src_guid: exact;
+            hdr.mf.dest_guid : exact;
         }
 
         actions = {
@@ -165,6 +167,7 @@ control ingress(inout headers_t hdr,
     }
     table routing_geo_table {
         key = {
+            hdr.ethernet.ether_type: exact;
             hdr.gbc.geoAreaPosLat: exact;
             hdr.gbc.geoAreaPosLon: exact;
             hdr.gbc.disa: exact;

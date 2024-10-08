@@ -143,7 +143,9 @@ control ingress(inout headers_t hdr,
     }
     table routing_mf_table {
         key = {
-             hdr.mf.dest_guid : exact;
+            hdr.ethernet.ether_type: exact;
+            hdr.mf.src_guid: exact;
+            hdr.mf.dest_guid : exact;
         }
 
         actions = {
@@ -162,8 +164,10 @@ control ingress(inout headers_t hdr,
     }
     table routing_ndn_table {
         key = {
+            hdr.ethernet.ether_type: exact;
             hdr.ndn.ndn_prefix.code: exact;
             hdr.ndn.name_tlv.components[0].value: exact;
+            hdr.ndn.name_tlv.components[1].value: exact;
             hdr.ndn.content_tlv.value: exact;
         }
 

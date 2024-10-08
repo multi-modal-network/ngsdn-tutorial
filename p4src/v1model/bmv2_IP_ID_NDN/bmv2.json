@@ -10,6 +10,7 @@
         ["port_meters_ingress_ingress_color", 8, false],
         ["host_meter_control_meter_tag", 8, false],
         ["key_0", 32, false],
+        ["key_1", 32, false],
         ["tmp_2", 32, false],
         ["tmp_3", 32, false],
         ["port_meters_egress_egress_color", 8, false],
@@ -528,7 +529,7 @@
       "name" : "fl",
       "source_info" : {
         "filename" : "p4src/v1model/bmv2_IP_ID_NDN.p4",
-        "line" : 246,
+        "line" : 254,
         "column" : 34,
         "source_fragment" : "{ standard_metadata.ingress_port }"
       },
@@ -1185,7 +1186,7 @@
       "id" : 0,
       "source_info" : {
         "filename" : "p4src/v1model/bmv2_IP_ID_NDN.p4",
-        "line" : 155,
+        "line" : 157,
         "column" : 8,
         "source_fragment" : "counters"
       },
@@ -1197,7 +1198,7 @@
       "id" : 1,
       "source_info" : {
         "filename" : "p4src/v1model/bmv2_IP_ID_NDN.p4",
-        "line" : 176,
+        "line" : 180,
         "column" : 8,
         "source_fragment" : "counters"
       },
@@ -1209,7 +1210,7 @@
       "id" : 2,
       "source_info" : {
         "filename" : "p4src/v1model/bmv2_IP_ID_NDN.p4",
-        "line" : 207,
+        "line" : 213,
         "column" : 6,
         "source_fragment" : "counters"
       },
@@ -1221,7 +1222,7 @@
       "id" : 3,
       "source_info" : {
         "filename" : "p4src/v1model/bmv2_IP_ID_NDN.p4",
-        "line" : 222,
+        "line" : 230,
         "column" : 8,
         "source_fragment" : "counters"
       },
@@ -1257,7 +1258,7 @@
       "id" : 6,
       "source_info" : {
         "filename" : "p4src/v1model/bmv2_IP_ID_NDN.p4",
-        "line" : 266,
+        "line" : 274,
         "column" : 8,
         "source_fragment" : "counters"
       },
@@ -1835,7 +1836,7 @@
           ],
           "source_info" : {
             "filename" : "p4src/v1model/bmv2_IP_ID_NDN.p4",
-            "line" : 161,
+            "line" : 163,
             "column" : 8,
             "source_fragment" : "standard_metadata.egress_spec = dst_port"
           }
@@ -1866,7 +1867,7 @@
           ],
           "source_info" : {
             "filename" : "p4src/v1model/bmv2_IP_ID_NDN.p4",
-            "line" : 194,
+            "line" : 198,
             "column" : 8,
             "source_fragment" : "standard_metadata.egress_spec = dst_port"
           }
@@ -1897,7 +1898,7 @@
           ],
           "source_info" : {
             "filename" : "p4src/v1model/bmv2_IP_ID_NDN.p4",
-            "line" : 211,
+            "line" : 217,
             "column" : 8,
             "source_fragment" : "standard_metadata.egress_spec = dst_port"
           }
@@ -1923,7 +1924,7 @@
           ],
           "source_info" : {
             "filename" : "p4src/v1model/bmv2_IP_ID_NDN.p4",
-            "line" : 238,
+            "line" : 246,
             "column" : 8,
             "source_fragment" : "standard_metadata.egress_spec = 255"
           }
@@ -1949,7 +1950,7 @@
           ],
           "source_info" : {
             "filename" : "p4src/v1model/bmv2_IP_ID_NDN.p4",
-            "line" : 246,
+            "line" : 254,
             "column" : 8,
             "source_fragment" : "clone3(CloneType.I2E, 99, { standard_metadata.ingress_port })"
           }
@@ -2209,7 +2210,7 @@
           ],
           "source_info" : {
             "filename" : "p4src/v1model/bmv2_IP_ID_NDN.p4",
-            "line" : 302,
+            "line" : 310,
             "column" : 12,
             "source_fragment" : "standard_metadata.egress_spec = hdr.packet_out.egress_port"
           }
@@ -2224,7 +2225,7 @@
           ],
           "source_info" : {
             "filename" : "p4src/v1model/bmv2_IP_ID_NDN.p4",
-            "line" : 304,
+            "line" : 312,
             "column" : 12,
             "source_fragment" : "hdr.packet_out.setInvalid()"
           }
@@ -2234,7 +2235,7 @@
           "parameters" : [],
           "source_info" : {
             "filename" : "p4src/v1model/bmv2_IP_ID_NDN.p4",
-            "line" : 306,
+            "line" : 314,
             "column" : 12,
             "source_fragment" : "exit"
           }
@@ -2260,9 +2261,28 @@
           ],
           "source_info" : {
             "filename" : "p4src/v1model/bmv2_IP_ID_NDN.p4",
-            "line" : 166,
+            "line" : 169,
             "column" : 12,
             "source_fragment" : "hdr.ndn.name_tlv.components[0].value"
+          }
+        },
+        {
+          "op" : "assign",
+          "parameters" : [
+            {
+              "type" : "field",
+              "value" : ["scalars", "key_1"]
+            },
+            {
+              "type" : "field",
+              "value" : ["_ndn_name_tlv_components12[1]", "value"]
+            }
+          ],
+          "source_info" : {
+            "filename" : "p4src/v1model/bmv2_IP_ID_NDN.p4",
+            "line" : 170,
+            "column" : 12,
+            "source_fragment" : "hdr.ndn.name_tlv.components[1].value"
           }
         }
       ]
@@ -2790,7 +2810,7 @@
           "id" : 7,
           "source_info" : {
             "filename" : "p4src/v1model/bmv2_IP_ID_NDN.p4",
-            "line" : 302,
+            "line" : 310,
             "column" : 42,
             "source_fragment" : "= hdr.packet_out.egress_port; ..."
           },
@@ -2826,6 +2846,18 @@
           "key" : [
             {
               "match_type" : "exact",
+              "name" : "hdr.ethernet.ether_type",
+              "target" : ["_ethernet2", "ether_type"],
+              "mask" : null
+            },
+            {
+              "match_type" : "exact",
+              "name" : "hdr.id.srcIdentity",
+              "target" : ["_id5", "srcIdentity"],
+              "mask" : null
+            },
+            {
+              "match_type" : "exact",
               "name" : "hdr.id.dstIdentity",
               "target" : ["_id5", "dstIdentity"],
               "mask" : null
@@ -2856,9 +2888,9 @@
           "id" : 9,
           "source_info" : {
             "filename" : "p4src/v1model/bmv2_IP_ID_NDN.p4",
-            "line" : 166,
+            "line" : 169,
             "column" : 12,
-            "source_fragment" : "hdr.ndn.name_tlv.components[0].value"
+            "source_fragment" : "hdr.ndn.name_tlv.components[0].value: exact; ..."
           },
           "key" : [],
           "match_type" : "exact",
@@ -2885,11 +2917,17 @@
           "id" : 10,
           "source_info" : {
             "filename" : "p4src/v1model/bmv2_IP_ID_NDN.p4",
-            "line" : 163,
+            "line" : 165,
             "column" : 10,
             "source_fragment" : "routing_ndn_table"
           },
           "key" : [
+            {
+              "match_type" : "exact",
+              "name" : "hdr.ethernet.ether_type",
+              "target" : ["_ethernet2", "ether_type"],
+              "mask" : null
+            },
             {
               "match_type" : "exact",
               "name" : "hdr.ndn.ndn_prefix.code",
@@ -2900,6 +2938,12 @@
               "match_type" : "exact",
               "name" : "hdr.ndn.name_tlv.components[0].value",
               "target" : ["scalars", "key_0"],
+              "mask" : null
+            },
+            {
+              "match_type" : "exact",
+              "name" : "hdr.ndn.name_tlv.components[1].value",
+              "target" : ["scalars", "key_1"],
               "mask" : null
             },
             {
@@ -2934,11 +2978,23 @@
           "id" : 11,
           "source_info" : {
             "filename" : "p4src/v1model/bmv2_IP_ID_NDN.p4",
-            "line" : 198,
+            "line" : 202,
             "column" : 10,
             "source_fragment" : "routing_v6_table"
           },
           "key" : [
+            {
+              "match_type" : "exact",
+              "name" : "hdr.ethernet.ether_type",
+              "target" : ["_ethernet2", "ether_type"],
+              "mask" : null
+            },
+            {
+              "match_type" : "exact",
+              "name" : "hdr.ipv6.src_addr",
+              "target" : ["_ipv63", "src_addr"],
+              "mask" : null
+            },
             {
               "match_type" : "exact",
               "name" : "hdr.ipv6.dst_addr",
@@ -2966,11 +3022,23 @@
           "id" : 12,
           "source_info" : {
             "filename" : "p4src/v1model/bmv2_IP_ID_NDN.p4",
-            "line" : 214,
+            "line" : 220,
             "column" : 10,
             "source_fragment" : "routing_v4_table"
           },
           "key" : [
+            {
+              "match_type" : "exact",
+              "name" : "hdr.ethernet.ether_type",
+              "target" : ["_ethernet2", "ether_type"],
+              "mask" : null
+            },
+            {
+              "match_type" : "exact",
+              "name" : "hdr.ipv4.srcAddr",
+              "target" : ["_ipv44", "srcAddr"],
+              "mask" : null
+            },
             {
               "match_type" : "exact",
               "name" : "hdr.ipv4.dstAddr",
@@ -3123,7 +3191,7 @@
           "id" : 17,
           "source_info" : {
             "filename" : "p4src/v1model/bmv2_IP_ID_NDN.p4",
-            "line" : 249,
+            "line" : 257,
             "column" : 10,
             "source_fragment" : "acl_table"
           },
@@ -3206,7 +3274,7 @@
           "id" : 0,
           "source_info" : {
             "filename" : "p4src/v1model/bmv2_IP_ID_NDN.p4",
-            "line" : 191,
+            "line" : 195,
             "column" : 57,
             "source_fragment" : "ecmp_selector"
           },
@@ -3301,7 +3369,7 @@
           "id" : 3,
           "source_info" : {
             "filename" : "p4src/v1model/bmv2_IP_ID_NDN.p4",
-            "line" : 300,
+            "line" : 308,
             "column" : 12,
             "source_fragment" : "hdr.packet_out.isValid()"
           },
@@ -3324,7 +3392,7 @@
           "id" : 4,
           "source_info" : {
             "filename" : "p4src/v1model/bmv2_IP_ID_NDN.p4",
-            "line" : 308,
+            "line" : 316,
             "column" : 12,
             "source_fragment" : "hdr.ethernet.ether_type == ETHERTYPE_ID && hdr.id.isValid()"
           },
@@ -3367,7 +3435,7 @@
           "id" : 5,
           "source_info" : {
             "filename" : "p4src/v1model/bmv2_IP_ID_NDN.p4",
-            "line" : 310,
+            "line" : 318,
             "column" : 19,
             "source_fragment" : "hdr.ethernet.ether_type == ETHERTYPE_NDN"
           },
@@ -3393,7 +3461,7 @@
           "id" : 6,
           "source_info" : {
             "filename" : "p4src/v1model/bmv2_IP_ID_NDN.p4",
-            "line" : 312,
+            "line" : 320,
             "column" : 19,
             "source_fragment" : "hdr.ipv6.isValid()"
           },
@@ -3416,7 +3484,7 @@
           "id" : 7,
           "source_info" : {
             "filename" : "p4src/v1model/bmv2_IP_ID_NDN.p4",
-            "line" : 316,
+            "line" : 324,
             "column" : 19,
             "source_fragment" : "hdr.ipv4.isValid()"
           },
@@ -3439,7 +3507,7 @@
           "id" : 8,
           "source_info" : {
             "filename" : "p4src/v1model/bmv2_IP_ID_NDN.p4",
-            "line" : 318,
+            "line" : 326,
             "column" : 19,
             "source_fragment" : "!l2_exact_table.apply().hit"
           },
@@ -3471,7 +3539,7 @@
       "id" : 1,
       "source_info" : {
         "filename" : "p4src/v1model/bmv2_IP_ID_NDN.p4",
-        "line" : 333,
+        "line" : 341,
         "column" : 8,
         "source_fragment" : "egress"
       },

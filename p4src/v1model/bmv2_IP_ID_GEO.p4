@@ -144,6 +144,8 @@ control ingress(inout headers_t hdr,
 
     table routing_id_table {
         key = {
+            hdr.ethernet.ether_type: exact;
+            hdr.id.srcIdentity: exact;
             hdr.id.dstIdentity: exact;
         }
         actions = {
@@ -165,6 +167,7 @@ control ingress(inout headers_t hdr,
     }
     table routing_geo_table {
         key = {
+            hdr.ethernet.ether_type: exact;
             hdr.gbc.geoAreaPosLat: exact;
             hdr.gbc.geoAreaPosLon: exact;
             hdr.gbc.disa: exact;
@@ -202,7 +205,9 @@ control ingress(inout headers_t hdr,
     // Look for the "implementation" property in the table definition.
     table routing_v6_table {
       key = {
-          hdr.ipv6.dst_addr:          exact;
+          hdr.ethernet.ether_type: exact;
+          hdr.ipv6.src_addr: exact;
+          hdr.ipv6.dst_addr: exact;
       }
       actions = {
           set_next_v6_hop;
@@ -218,6 +223,8 @@ control ingress(inout headers_t hdr,
     
     table routing_v4_table {
         key = {
+            hdr.ethernet.ether_type: exact;
+            hdr.ipv4.srcAddr: exact;
             hdr.ipv4.dstAddr: exact;
         }
         actions = {

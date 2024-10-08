@@ -154,24 +154,30 @@ tables {
   }
   match_fields {
     id: 1
+    name: "hdr.ethernet.ether_type"
+    bitwidth: 16
+    match_type: EXACT
+  }
+  match_fields {
+    id: 2
     name: "hdr.gbc.geoAreaPosLat"
     bitwidth: 32
     match_type: EXACT
   }
   match_fields {
-    id: 2
+    id: 3
     name: "hdr.gbc.geoAreaPosLon"
     bitwidth: 32
     match_type: EXACT
   }
   match_fields {
-    id: 3
+    id: 4
     name: "hdr.gbc.disa"
     bitwidth: 16
     match_type: EXACT
   }
   match_fields {
-    id: 4
+    id: 5
     name: "hdr.gbc.disb"
     bitwidth: 16
     match_type: EXACT
@@ -196,18 +202,30 @@ tables {
   }
   match_fields {
     id: 1
+    name: "hdr.ethernet.ether_type"
+    bitwidth: 16
+    match_type: EXACT
+  }
+  match_fields {
+    id: 2
     name: "hdr.ndn.ndn_prefix.code"
     bitwidth: 8
     match_type: EXACT
   }
   match_fields {
-    id: 2
+    id: 3
     name: "hdr.ndn.name_tlv.components[0].value"
     bitwidth: 32
     match_type: EXACT
   }
   match_fields {
-    id: 3
+    id: 4
+    name: "hdr.ndn.name_tlv.components[1].value"
+    bitwidth: 32
+    match_type: EXACT
+  }
+  match_fields {
+    id: 5
     name: "hdr.ndn.content_tlv.value"
     bitwidth: 16
     match_type: EXACT
@@ -229,6 +247,18 @@ tables {
   }
   match_fields {
     id: 1
+    name: "hdr.ethernet.ether_type"
+    bitwidth: 16
+    match_type: EXACT
+  }
+  match_fields {
+    id: 2
+    name: "hdr.ipv6.src_addr"
+    bitwidth: 128
+    match_type: EXACT
+  }
+  match_fields {
+    id: 3
     name: "hdr.ipv6.dst_addr"
     bitwidth: 128
     match_type: EXACT
@@ -253,6 +283,18 @@ tables {
   }
   match_fields {
     id: 1
+    name: "hdr.ethernet.ether_type"
+    bitwidth: 16
+    match_type: EXACT
+  }
+  match_fields {
+    id: 2
+    name: "hdr.ipv4.srcAddr"
+    bitwidth: 32
+    match_type: EXACT
+  }
+  match_fields {
+    id: 3
     name: "hdr.ipv4.dstAddr"
     bitwidth: 32
     match_type: EXACT

@@ -527,7 +527,7 @@
       "name" : "fl",
       "source_info" : {
         "filename" : "p4src/v1model/bmv2_GEO.p4",
-        "line" : 186,
+        "line" : 187,
         "column" : 34,
         "source_fragment" : "{ standard_metadata.ingress_port }"
       },
@@ -1184,7 +1184,7 @@
       "id" : 0,
       "source_info" : {
         "filename" : "p4src/v1model/bmv2_GEO.p4",
-        "line" : 162,
+        "line" : 163,
         "column" : 8,
         "source_fragment" : "counters"
       },
@@ -1220,7 +1220,7 @@
       "id" : 3,
       "source_info" : {
         "filename" : "p4src/v1model/bmv2_GEO.p4",
-        "line" : 206,
+        "line" : 207,
         "column" : 8,
         "source_fragment" : "counters"
       },
@@ -1752,7 +1752,7 @@
           ],
           "source_info" : {
             "filename" : "p4src/v1model/bmv2_GEO.p4",
-            "line" : 178,
+            "line" : 179,
             "column" : 8,
             "source_fragment" : "standard_metadata.egress_spec = 255"
           }
@@ -1778,7 +1778,7 @@
           ],
           "source_info" : {
             "filename" : "p4src/v1model/bmv2_GEO.p4",
-            "line" : 186,
+            "line" : 187,
             "column" : 8,
             "source_fragment" : "clone3(CloneType.I2E, 99, { standard_metadata.ingress_port })"
           }
@@ -2038,7 +2038,7 @@
           ],
           "source_info" : {
             "filename" : "p4src/v1model/bmv2_GEO.p4",
-            "line" : 242,
+            "line" : 243,
             "column" : 12,
             "source_fragment" : "standard_metadata.egress_spec = hdr.packet_out.egress_port"
           }
@@ -2053,7 +2053,7 @@
           ],
           "source_info" : {
             "filename" : "p4src/v1model/bmv2_GEO.p4",
-            "line" : 244,
+            "line" : 245,
             "column" : 12,
             "source_fragment" : "hdr.packet_out.setInvalid()"
           }
@@ -2063,7 +2063,7 @@
           "parameters" : [],
           "source_info" : {
             "filename" : "p4src/v1model/bmv2_GEO.p4",
-            "line" : 246,
+            "line" : 247,
             "column" : 12,
             "source_fragment" : "exit"
           }
@@ -2593,7 +2593,7 @@
           "id" : 7,
           "source_info" : {
             "filename" : "p4src/v1model/bmv2_GEO.p4",
-            "line" : 242,
+            "line" : 243,
             "column" : 42,
             "source_fragment" : "= hdr.packet_out.egress_port; ..."
           },
@@ -2627,6 +2627,12 @@
             "source_fragment" : "routing_geo_table"
           },
           "key" : [
+            {
+              "match_type" : "exact",
+              "name" : "hdr.ethernet.ether_type",
+              "target" : ["_ethernet2", "ether_type"],
+              "mask" : null
+            },
             {
               "match_type" : "exact",
               "name" : "hdr.gbc.geoAreaPosLat",
@@ -2798,7 +2804,7 @@
           "id" : 13,
           "source_info" : {
             "filename" : "p4src/v1model/bmv2_GEO.p4",
-            "line" : 189,
+            "line" : 190,
             "column" : 10,
             "source_fragment" : "acl_table"
           },
@@ -2960,7 +2966,7 @@
           "id" : 3,
           "source_info" : {
             "filename" : "p4src/v1model/bmv2_GEO.p4",
-            "line" : 240,
+            "line" : 241,
             "column" : 12,
             "source_fragment" : "hdr.packet_out.isValid()"
           },
@@ -2983,7 +2989,7 @@
           "id" : 4,
           "source_info" : {
             "filename" : "p4src/v1model/bmv2_GEO.p4",
-            "line" : 248,
+            "line" : 249,
             "column" : 12,
             "source_fragment" : "hdr.ethernet.ether_type == ETHERTYPE_GEO && hdr.geo.isValid()"
           },
@@ -3026,7 +3032,7 @@
           "id" : 5,
           "source_info" : {
             "filename" : "p4src/v1model/bmv2_GEO.p4",
-            "line" : 250,
+            "line" : 251,
             "column" : 19,
             "source_fragment" : "!l2_exact_table.apply().hit"
           },
@@ -3058,7 +3064,7 @@
       "id" : 1,
       "source_info" : {
         "filename" : "p4src/v1model/bmv2_GEO.p4",
-        "line" : 265,
+        "line" : 266,
         "column" : 8,
         "source_fragment" : "egress"
       },

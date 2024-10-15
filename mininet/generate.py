@@ -259,8 +259,9 @@ def generate_ndn_flows(switch, port, identifier1, identifier2=None):
         ]
     }
 
-def generate_id_flows(switch, port, identifier1, identifier2):
-    identity = 202271720 + vmx * 100000 + identifier1 - 64
+def generate_id_flows(switch, port, src, dst):
+    identity_src = 202271720 + vmx * 100000 + src - 64
+    identity_dst = 202271720 + vmx * 100000 + dst - 64
     return {
         "flows": [
           {
@@ -288,9 +289,19 @@ def generate_id_flows(switch, port, identifier1, identifier2):
                   "type": "PROTOCOL_INDEPENDENT",
                   "matches": [
                     {
+                      "field": "hdr.ethernet.ether_type",
+                      "match": "exact",
+                      "value": "0812"
+                    },
+                    {
+                      "field": "hdr.id.srcIdentity",
+                      "match": "exact",
+                      "value": decimal_to_8hex(identity_src)
+                    },
+                    {
                       "field": "hdr.id.dstIdentity",
                       "match": "exact",
-                      "value": decimal_to_8hex(identity)
+                      "value": decimal_to_8hex(identity_dst)
                     },
                   ]
                 }
@@ -300,21 +311,21 @@ def generate_id_flows(switch, port, identifier1, identifier2):
         ]
     }
 
-def post_flow(modelType, switch, port, identifier1, identifier2):
+def post_flow(modelType, switch, port, src, dst):
     url = f'http://{ip}:8181/onos/v1/flows?appId={appId}'
     auth = HTTPBasicAuth('onos', 'rocks')
     headers = {'Content-Type': 'application/json'}
 
     if modelType == 'ip':
-        data = generate_ip_flows(switch, port, identifier1)
+        data = generate_ip_flows(switch, port, src, dst)
     elif modelType == 'mf':
-        data = generate_mf_flows(switch, port, identifier1)
+        data = generate_mf_flows(switch, port, src, dst)
     elif modelType == 'geo':
-        data = generate_geo_flows(switch, port, identifier1)
+        data = generate_geo_flows(switch, port, src, dst)
     elif modelType == 'ndn':
-        data = generate_ndn_flows(switch, port, identifier1,identifier2)
+        data = generate_ndn_flows(switch, port, src, dst)
     elif modelType == 'id':
-        data = generate_id_flows(switch, port, identifier1)
+        data = generate_id_flows(switch, port, src, dst)
 
     # 发送请求
     try:
@@ -346,7 +357,7 @@ def execute_add_flow(line):
     # src至lca(src,dst)路径中交换机需要下发流表（当前节点向父节点转发）
     # lca(src,dst)至dst路径中交换机需要下发流表（当前节点的父节点向当前节点转发）
 
-    post_flow(modelType, dstSwitch, 2, dstIdentifier, srcIdentifier) # dstSwitch需要向网卡eth2的端口转发
+    post_flow(modelType, dstSwitch, 2, srcIdentifier, dstIdentifier) # dstSwitch需要向网卡eth2的端口转发
     involve_switchs.append(dstSwitch)
 
     depth_src = math.floor(math.log2(srcSwitch)) + 1
@@ -357,7 +368,7 @@ def execute_add_flow(line):
     # srcSwitch深度更大
     if depth_src > depth_dst:
         while depth_src != depth_dst:
-            post_flow(modelType, srcSwitch, 1, dstIdentifier, srcIdentifier) # 只能通过eth1向父节点转发
+            post_flow(modelType, srcSwitch, 1, srcIdentifier, dstIdentifier) # 只能通过eth1向父节点转发
             involve_switchs.append(srcSwitch)
             srcSwitch = math.floor(srcSwitch / 2)
             depth_src = depth_src - 1
@@ -367,21 +378,21 @@ def execute_add_flow(line):
         while depth_src != depth_dst:
             father = math.floor(dstSwitch / 2)
             if father*2 == dstSwitch:
-                post_flow(modelType, father, 2, dstIdentifier, srcIdentifier) # 通过eth2向左儿子转发
+                post_flow(modelType, father, 2, srcIdentifier, dstIdentifier) # 通过eth2向左儿子转发
             elif father*2+1 == dstSwitch:
-                post_flow(modelType, father, 3, dstIdentifier, srcIdentifier) # 通过eth3向右儿子转发
+                post_flow(modelType, father, 3, srcIdentifier, dstIdentifier) # 通过eth3向右儿子转发
             involve_switchs.append(father)
             dstSwitch = math.floor(dstSwitch / 2)
             depth_dst = depth_dst - 1
 
     # srcSwitch和dstSwitch在同一层，srcSwitch向父节点转发，dstSwitch的父节点向dstSwitch转发
     while True:
-        post_flow(modelType, srcSwitch, 1, dstIdentifier, srcIdentifier)
+        post_flow(modelType, srcSwitch, 1, srcIdentifier, dstIdentifier)
         father = math.floor(dstSwitch / 2)
         if father*2 == dstSwitch:
-            post_flow(modelType, father, 2, dstIdentifier, srcIdentifier)
+            post_flow(modelType, father, 2, srcIdentifier, dstIdentifier)
         elif father*2+1 == dstSwitch:
-            post_flow(modelType, father, 3, dstIdentifier, srcIdentifier)
+            post_flow(modelType, father, 3, srcIdentifier, dstIdentifier)
         involve_switchs.append(srcSwitch)
         involve_switchs.append(father)
         srcSwitch = math.floor(srcSwitch / 2)

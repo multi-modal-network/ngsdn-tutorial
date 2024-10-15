@@ -68,8 +68,9 @@ def decimal_to_4hex(value):
     hex_number = format(value, 'x').zfill(4)
     return hex_number
 
-def generate_ip_flows(switch, port, identifier1, identifier2=None):
-    ip = f"172.20.{vmx + 1}.{identifier1 - 64 + 12}"
+def generate_ip_flows(switch, port, src, dst):
+    ip_src = f"172.20.{vmx + 1}.{src - 64 + 12}"
+    ip_dst = f"172.20.{vmx + 1}.{dst - 64 + 12}"
     return {
         "flows": [
           {
@@ -97,9 +98,19 @@ def generate_ip_flows(switch, port, identifier1, identifier2=None):
                   "type": "PROTOCOL_INDEPENDENT",
                   "matches": [
                     {
+                      "field": "hdr.ethernet.ether_type",
+                      "match": "exact",
+                      "value": "0800"
+                    },
+                    {
+                      "field": "hdr.ipv4.srcAddr",
+                      "match": "exact",
+                      "value": ip_to_hex(ip_src)
+                    },
+                    {
                       "field": "hdr.ipv4.dstAddr",
                       "match": "exact",
-                      "value": ip_to_hex(ip)
+                      "value": ip_to_hex(ip_dst)
                     }
                   ]
                 }
@@ -109,8 +120,9 @@ def generate_ip_flows(switch, port, identifier1, identifier2=None):
         ]
     }
 
-def generate_mf_flows(switch, port, identifier1, identifier2=None):
-    mf_guid = 1 + vmx * 100 + identifier1 - 64
+def generate_mf_flows(switch, port, src, dst):
+    mf_src_guid = 1 + vmx * 100 + src - 64
+    mf_dst_guid = 1 + vmx * 100 + dst - 64
     return {
         "flows": [
           {
@@ -138,9 +150,19 @@ def generate_mf_flows(switch, port, identifier1, identifier2=None):
                   "type": "PROTOCOL_INDEPENDENT",
                   "matches": [
                     {
+                      "field": "hdr.ethernet.ether_type",
+                      "match": "exact",
+                      "value": "27c0"
+                    },
+                    {
+                      "field": "hdr.mf.src_guid",
+                      "match": "exact",
+                      "value": decimal_to_8hex(mf_src_guid)
+                    },
+                    {
                       "field": "hdr.mf.dest_guid",
                       "match": "exact",
-                      "value": decimal_to_8hex(mf_guid)
+                      "value": decimal_to_8hex(mf_dst_guid)
                     }
                   ]
                 }
@@ -150,9 +172,9 @@ def generate_mf_flows(switch, port, identifier1, identifier2=None):
         ]
     }
 
-def generate_geo_flows(switch, port, identifier1, identifier2=None):
-    geoPosLat = identifier1 - 63
-    geoPosLon = float_to_custom_bin(-180 + vmx * 20 + (identifier1 - 64) * 0.4)
+def generate_geo_flows(switch, port, src, dst):
+    geoPosLat = dst - 63
+    geoPosLon = float_to_custom_bin(-180 + vmx * 20 + (dst - 64) * 0.4)
     return {
         "flows": [
           {
@@ -179,6 +201,11 @@ def generate_geo_flows(switch, port, identifier1, identifier2=None):
                 {
                   "type": "PROTOCOL_INDEPENDENT",
                   "matches": [
+                    {
+                      "field": "hdr.ethernet.ether_type",
+                      "match": "exact",
+                      "value": "8947"
+                    },
                     {
                       "field": "hdr.gbc.geoAreaPosLat",
                       "match": "exact",
@@ -207,9 +234,10 @@ def generate_geo_flows(switch, port, identifier1, identifier2=None):
         ]
     }
 
-def generate_ndn_flows(switch, port, identifier1, identifier2=None):
-    ndn_name = 202271720 + vmx * 100000 + identifier1 - 64
-    ndn_content = 2048 + vmx * 100 + identifier2 - 64
+def generate_ndn_flows(switch, port, src, dst):
+    ndn_src_name = 202271720 + vmx * 100000 + src - 64
+    ndn_dst_name = 202271720 + vmx * 100000 + dst - 64
+    ndn_content = 2048 + vmx * 100 + src - 64
     return {
         "flows": [
           {
@@ -237,6 +265,11 @@ def generate_ndn_flows(switch, port, identifier1, identifier2=None):
                   "type": "PROTOCOL_INDEPENDENT",
                   "matches": [
                     {
+                      "field": "hdr.ethernet.ether_type",
+                      "match": "exact",
+                      "value": "8624"
+                    },
+                    {
                       "field": "hdr.ndn.ndn_prefix.code",
                       "match": "exact",
                       "value": "06"
@@ -244,7 +277,12 @@ def generate_ndn_flows(switch, port, identifier1, identifier2=None):
                     {
                       "field": "hdr.ndn.name_tlv.components[0].value",
                       "match": "exact",
-                      "value": decimal_to_8hex(ndn_name)
+                      "value": decimal_to_8hex(ndn_src_name)
+                    },
+                    {
+                      "field": "hdr.ndn.name_tlv.components[1].value",
+                      "match": "exact",
+                      "value": decimal_to_8hex(ndn_dst_name)
                     },
                     {
                       "field": "hdr.ndn.content_tlv.value",

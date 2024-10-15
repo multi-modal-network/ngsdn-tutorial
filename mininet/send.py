@@ -128,9 +128,9 @@ def generate_ndn_pkt(ethertype, source_host, destination_host):
     content = 2048 + x * 100 + i - 64
     print(name_component_dst, content)
     pkt = Ether(type=ethertype)
-    pkt = pkt / Raw(load=struct.pack("!LLLLLLLLL", 0x6fd0020, 0x80c0804, name_component_dst,
-                                     0x08840000 | ((name_component_src >> 16) & 0xffff)
-                                     , (((name_component_src & 0xffff)) << 16) | 0x1e00, 0x18020000, 0x19020000,0x1b020000,0x1a020000 | content))
+    pkt = pkt / Raw(load=struct.pack("!LLLLLLLLL", 0x6fd0020, 0x80c0804, name_component_src,
+                                     0x08840000 | ((name_component_dst >> 16) & 0xffff)
+                                     , (((name_component_dst & 0xffff)) << 16) | 0x1e00, 0x18020000, 0x19020000,0x1b020000,0x1a020000 | content))
     pkt.show2()
     return pkt
 

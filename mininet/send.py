@@ -170,10 +170,10 @@ def main():
     end_time = time.time() + total_time
 
     # 下发流表
-    message = f"{modal_type},{source_host},{destination_host}\n"
-    with open('flows.out', 'a') as file:
-        file.write(message)
-    time.sleep(0.8)
+    # message = f"{modal_type},{source_host},{destination_host}\n"
+    # with open('flows.out', 'a') as file:
+    #     file.write(message)
+    # time.sleep(0.8)
 
     # 生成数据包
     while time.time() < end_time:

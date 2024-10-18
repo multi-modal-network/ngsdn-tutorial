@@ -150,7 +150,9 @@ control ingress(inout headers_t hdr,
         }
         actions = {
             set_next_id_hop;
+            to_cpu;
         }
+        default_action = to_cpu;
         @name("routing_id_table_counter")
         counters = direct_counter(CounterType.packets_and_bytes);
     }

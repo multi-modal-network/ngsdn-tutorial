@@ -1,3 +1,11 @@
-sniffing on h166-eth0
+sniffing on h173-eth0
+got an ID packet
+###[ Ethernet ]### 
+  dst       = ff:ff:ff:ff:ff:ff
+  src       = 00:00:00:00:00:00
+  type      = 0x812
+###[ Raw ]### 
+     load      = '\x0c\x0f\\xf2\\xaa\x0c\x0f\\xf2\\x91'
+
 
 

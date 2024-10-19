@@ -61,7 +61,7 @@ def float_to_custom_bin(number):
 
 # generate geo packet
 def generate_geo_pkt(ethertype, source_host, destination_host):
-    hostId = int(destination_host[1:]) - 64
+    hostId = destination_host - 64
     x = math.floor(hostId / 100)
     i = hostId % 100 + 64
     geoAreaPosLat = i - 63
@@ -79,7 +79,7 @@ def generate_geo_pkt(ethertype, source_host, destination_host):
 
 # generate id packet
 def hostToIDParam(parameter):
-    hostId = int(parameter[1:]) - 64
+    hostId = parameter - 64
     x = math.floor(hostId / 100)
     i = hostId % 100 + 64
     return 202271720 + x * 100000 + i - 64
@@ -96,7 +96,7 @@ def generate_id_pkt(ethertype, source_host, destination_host):  # 从主机信�
 
 # generate mf packet
 def hostToMFParam(parameter):
-    hostId = int(parameter[1:]) - 64
+    hostId = parameter - 64
     x = math.floor(hostId / 100)
     i = hostId % 100 + 64
     return 1 + x * 100 + i - 64
@@ -113,14 +113,14 @@ def generate_mf_pkt(ethertype, source_host, destination_host):
 
 # generate ndn packet
 def hostToNDNParam(parameter):
-    hostId = int(parameter[1:]) - 64
+    hostId = parameter - 64
     x = math.floor(hostId / 100)
     i = hostId % 100 + 64
     return 202271720 + x * 100000 + i - 64
 
 
 def generate_ndn_pkt(ethertype, source_host, destination_host):
-    hostId = int(source_host[1:]) - 64  # 取参数1
+    hostId = source_host - 64  # 取参数1
     x = math.floor(hostId / 100)
     i = hostId % 100 + 64
     name_component_src = hostToNDNParam(source_host)
@@ -137,8 +137,7 @@ def generate_ndn_pkt(ethertype, source_host, destination_host):
 
 # generate IP packet
 def hostToIPParam(parameter):
-    print("hostToIPParam",parameter)
-    hostId = int(parameter[1:]) - 64
+    hostId = parameter - 64
     x = math.floor(hostId / 100)
     i = hostId % 100 + 64
     return "172.20.{}.{}".format(x + 1, i - 64 + 12)  # ip与拓扑中的一致
@@ -153,21 +152,28 @@ def generate_ip_pkt(ethertype, source_host, destination_host):
     pkt.show2()
     return pkt
 
+def getFileInfo(filename):
+    with open(filename, 'r') as file:
+        lines = file.readlines()
+        if lines:
+            last_line = lines[-1].strip()
+            line_count = len(lines)
+            return last_line.split(), line_count
+        else:
+            return [], 0
+
 def main():
     # 检查参数数量是否正确
-    if len(sys.argv) != 6:
-        print('Usage: <modal_type> <total_time> <frequency> <source_host> <destination_host>')
+    if len(sys.argv) != 5:
+        print('Usage: <modal_type> <frequency> <source_host> <destination_host>')
         exit(1)
 
     modal_type = sys.argv[1]
-    total_time = int(sys.argv[2])
-    frequency = float(sys.argv[3])
-    source_host = sys.argv[4]
-    destination_host = sys.argv[5]
+    frequency = int(sys.argv[2])
+    source_host = int(sys.argv[3][1:])
+    destination_host = int(sys.argv[4][1:])
 
-    print("modal_type:%s, total_time:%d, frequency:%d, source_host:%s, destination_host:%s" % (modal_type, total_time, frequency, source_host, destination_host))
-
-    end_time = time.time() + total_time
+    print("modal_type:%s, frequency:%d, source_host:%s, destination_host:%s" % (modal_type, frequency, source_host, destination_host))
 
     # 下发流表
     # message = f"{modal_type},{source_host},{destination_host}\n"
@@ -176,42 +182,45 @@ def main():
     # time.sleep(0.8)
 
     # 生成数据包
-    while time.time() < end_time:
-        s_time = time.time()
-        # check the modal type and generate the packet
-        if modal_type == "geo":
-            pkt = generate_geo_pkt(geo_ethertype, source_host, destination_host)
-        elif modal_type == "id":
-            pkt = generate_id_pkt(id_ethertype, source_host, destination_host)
-        elif modal_type == "mf":
-            pkt = generate_mf_pkt(mf_ethertype, source_host, destination_host)
-        elif modal_type == "ndn":
-            pkt = generate_ndn_pkt(ndn_ethertype, source_host, destination_host)
-        elif modal_type == "ip":
-            pkt = generate_ip_pkt(ip_ethertype, source_host, destination_host)
-        else:
-            print("Invalid modal type")
-            exit(1)
-        # get the interface
-        iface = get_if()
-        # print the interface and parameters
-        print("sending on interface %s form %s to %s, model : %s " % (iface, source_host, destination_host, modal_type))
+
+    if modal_type == "geo":
+        pkt = generate_geo_pkt(geo_ethertype, source_host, destination_host)
+    elif modal_type == "id":
+        pkt = generate_id_pkt(id_ethertype, source_host, destination_host)
+    elif modal_type == "mf":
+        pkt = generate_mf_pkt(mf_ethertype, source_host, destination_host)
+    elif modal_type == "ndn":
+        pkt = generate_ndn_pkt(ndn_ethertype, source_host, destination_host)
+    elif modal_type == "ip":
+        pkt = generate_ip_pkt(ip_ethertype, source_host, destination_host)
+    else:
+        print("Invalid modal type")
+        exit(1)
+    # get the interface
+    iface = get_if()
+    # print the interface and parameters
+    print("sending on interface %s form %s to %s, model : %s " % (iface, source_host, destination_host, modal_type))
         
-        # print("消息生产中...")
-        # try:
-        #   producer.send('multimodel', json.dumps(message).encode('utf-8'))
-        #   print(f"Message published to kafka: {message}")
-        # except Exception as e:
-        #   print(f"Error on publishing message: {e}")
-        # producer.flush()
-        
-        # 发送数据包
+    # print("消息生产中...")
+    # try:
+    #   producer.send('multimodel', json.dumps(message).encode('utf-8'))
+    #   print(f"Message published to kafka: {message}")
+    # except Exception as e:
+    #   print(f"Error on publishing message: {e}")
+    # producer.flush()
+    
+    # 发送数据包
+    for i in range (1, frequency+1):
+        line_before, cnt_before = getFileInfo("/home/onos/Desktop/ngsdn-tutorial/mininet/flows.out")
         sendp(pkt, iface=iface, verbose=False)
-        # 控制发送频率
-        e_time = time.time()
-        elapsed = e_time - s_time
-        sleep_time = max(1 / frequency - elapsed, 0)
-        time.sleep(sleep_time)#sleep time
+        time.sleep(0.5)
+        line_after, cnt_after = getFileInfo("/home/onos/Desktop/ngsdn-tutorial/mininet/flows.out")
+        print(line_before, cnt_before, line_after, cnt_after)
+        if cnt_after == cnt_before + 1:
+            print(line_after[0], line_after[1], line_after[2], modal_type, source_host, destination_host)
+            if line_after[0] == modal_type and int(line_after[1]) == source_host and int(line_after[2]) == destination_host:
+                print("resend!")
+                sendp(pkt, iface=iface, verbose=False)
 
 
 if __name__ == '__main__':

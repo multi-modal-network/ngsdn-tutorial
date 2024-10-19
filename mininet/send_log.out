@@ -1,11 +1,11 @@
 WARNING: Mac address to reach destination not found. Using broadcast.
 WARNING: Mac address to reach destination not found. Using broadcast.
-modal_type:mf, total_time:1, frequency:1, source_host:h180, destination_host:h166
+modal_type:id, total_time:1, frequency:1, source_host:h180, destination_host:h166
 ###[ Ethernet ]### 
   dst       = ff:ff:ff:ff:ff:ff
   src       = 00:00:00:00:00:00
-  type      = 0x27c0
+  type      = 0x812
 ###[ Raw ]### 
-     load      = '\x00\x00\x00\x01\x00\x00\x00u\x00\x00\x00g'
+     load      = '\x0c\x0f\\xf2\\x98\x0c\x0f\\xf2\\x8a'
 
-sending on interface h180-eth0 form h180 to h166, model : mf 
+sending on interface h180-eth0 form h180 to h166, model : id 

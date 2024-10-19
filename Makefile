@@ -96,14 +96,48 @@ clean:
 deep-clean: clean
 	-docker container rm ${app_build_container_name}
 
-p4-build: p4src/main.p4
+p4-build-single: p4src/v1model/${P4_FILE}.p4
 	$(info *** Building P4 program...)
-	@mkdir -p p4src/build
+	@rm -r p4src/v1model/${P4_FILE}
+	@mkdir -p p4src/v1model/${P4_FILE}
 	docker run --rm -v ${curr_dir}:/workdir -w /workdir ${P4C_IMG} \
-		p4c-bm2-ss --arch v1model -o p4src/build/bmv2.json \
-		--p4runtime-files p4src/build/p4info.txt --Wdisable=unsupported \
-		p4src/main.p4
-	@echo "*** P4 program compiled successfully! Output files are in p4src/build"
+		p4c-bm2-ss --arch v1model -o p4src/v1model/${P4_FILE}/bmv2.json \
+		--p4runtime-files p4src/v1model/${P4_FILE}/p4info.txt --Wdisable=unsupported \
+		p4src/v1model/${P4_FILE}.p4
+	@echo "*** P4 program compiled successfully! Output files are in p4src/v1model/${P4_FILE}"
+
+p4-build-all:
+	$(MAKE) p4-build-single P4_FILE=bmv2_IP
+	$(MAKE) p4-build-single P4_FILE=bmv2_ID
+	$(MAKE) p4-build-single P4_FILE=bmv2_GEO
+	$(MAKE) p4-build-single P4_FILE=bmv2_MF
+	$(MAKE) p4-build-single P4_FILE=bmv2_NDN
+  # $(MAKE) p4-build-single P4_FILE=bmv2_IP_ID
+	$(MAKE) p4-build-single P4_FILE=bmv2_IP_GEO
+	$(MAKE) p4-build-single P4_FILE=bmv2_IP_MF
+	$(MAKE) p4-build-single P4_FILE=bmv2_IP_NDN
+	$(MAKE) p4-build-single P4_FILE=bmv2_ID_GEO
+	$(MAKE) p4-build-single P4_FILE=bmv2_ID_MF
+	$(MAKE) p4-build-single P4_FILE=bmv2_ID_NDN
+	$(MAKE) p4-build-single P4_FILE=bmv2_GEO_MF
+	$(MAKE) p4-build-single P4_FILE=bmv2_GEO_NDN
+	$(MAKE) p4-build-single P4_FILE=bmv2_MF_NDN
+	$(MAKE) p4-build-single P4_FILE=bmv2_IP_ID_GEO
+	$(MAKE) p4-build-single P4_FILE=bmv2_IP_ID_MF
+	$(MAKE) p4-build-single P4_FILE=bmv2_IP_ID_NDN
+	$(MAKE) p4-build-single P4_FILE=bmv2_IP_GEO_MF
+	$(MAKE) p4-build-single P4_FILE=bmv2_IP_GEO_NDN
+	$(MAKE) p4-build-single P4_FILE=bmv2_IP_MF_NDN
+	$(MAKE) p4-build-single P4_FILE=bmv2_ID_GEO_MF
+	$(MAKE) p4-build-single P4_FILE=bmv2_ID_GEO_NDN
+	$(MAKE) p4-build-single P4_FILE=bmv2_ID_MF_NDN
+	$(MAKE) p4-build-single P4_FILE=bmv2_GEO_MF_NDN
+	$(MAKE) p4-build-single P4_FILE=bmv2_IP_ID_GEO_MF
+	$(MAKE) p4-build-single P4_FILE=bmv2_IP_ID_GEO_NDN
+	$(MAKE) p4-build-single P4_FILE=bmv2_IP_ID_MF_NDN
+	$(MAKE) p4-build-single P4_FILE=bmv2_IP_GEO_MF_NDN
+	$(MAKE) p4-build-single P4_FILE=bmv2_ID_GEO_MF_NDN
+	$(MAKE) p4-build-single P4_FILE=bmv2_IP_ID_GEO_MF_NDN
 
 p4-test:
 	@cd ptf && ./run_tests $(TEST)

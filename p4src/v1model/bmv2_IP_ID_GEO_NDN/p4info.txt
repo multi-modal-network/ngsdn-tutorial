@@ -300,9 +300,7 @@ tables {
     id: 16820677
   }
   action_refs {
-    id: 16800567
-    annotations: "@defaultonly"
-    scope: DEFAULT_ONLY
+    id: 16826548
   }
   implementation_id: 285252229
   direct_resource_ids: 318827568
@@ -336,9 +334,7 @@ tables {
     id: 16802906
   }
   action_refs {
-    id: 16800567
-    annotations: "@defaultonly"
-    scope: DEFAULT_ONLY
+    id: 16826548
   }
   direct_resource_ids: 318827227
   size: 1024

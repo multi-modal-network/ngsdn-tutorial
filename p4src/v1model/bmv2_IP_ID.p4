@@ -192,7 +192,9 @@ control ingress(inout headers_t hdr,
       }
       actions = {
           set_next_v6_hop;
+          to_cpu;
       }
+      default_action = to_cpu;
       implementation = ecmp_selector;
       @name("routing_v6_table_counter")
       counters = direct_counter(CounterType.packets_and_bytes);
@@ -210,7 +212,9 @@ control ingress(inout headers_t hdr,
         }
         actions = {
             set_next_v4_hop;
+            to_cpu;
         }
+        default_action = to_cpu;
         @name("routing_v4_table_counter")
         counters = direct_counter(CounterType.packets_and_bytes);
     }

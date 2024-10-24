@@ -41,18 +41,23 @@ def handle_pkt(pkt):
     if pkt.haslayer("Ether") and pkt[Ether].type == id_ethertype:
         print("got an ID packet")
         pkt.show2()
+        print("------------------------------------\n")
     elif pkt.haslayer("Ether") and pkt[Ether].type == geo_ethertype:
         print("got an GEO packet")
         pkt.show2()
+        print("------------------------------------\n")
     elif pkt.haslayer("Ether") and pkt[Ether].type == mf_ethertype:
         print("got an MF packet")
         pkt.show2()
+        print("------------------------------------\n")
     elif pkt.haslayer("Ether") and pkt[Ether].type == ndn_ethertype:
         print("got an NDN packet")
         pkt.show2()
+        print("------------------------------------\n")
     elif pkt.haslayer("Ether") and pkt[Ether].type == ip_ethertype:
         print("got an IP packet")
         pkt.show2()
+        print("------------------------------------\n")
         
     print("\n")
     

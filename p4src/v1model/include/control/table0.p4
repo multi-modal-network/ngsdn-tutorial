@@ -34,6 +34,10 @@ control table0_control(inout headers_t hdr,
         standard_metadata.egress_spec = CPU_PORT;
     }
 
+    action clone_to_cpu() {
+        clone3(CloneType.I2E, CPU_CLONE_SESSION_ID, {standard_metadata.ingress_port});
+    }
+
     action set_egress_port(port_num_t port) {
         standard_metadata.egress_spec = port;
     }
@@ -57,6 +61,7 @@ control table0_control(inout headers_t hdr,
         actions = {
             set_egress_port;
             send_to_cpu;
+            clone_to_cpu;
             set_next_hop_id;
             drop;
         }

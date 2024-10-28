@@ -56,7 +56,7 @@
       "id" : 2,
       "fields" : [
         ["egress_port", 9, false],
-        ["_pad", 7, false]
+        ["pad0", 7, false]
       ]
     },
     {
@@ -64,7 +64,7 @@
       "id" : 3,
       "fields" : [
         ["ingress_port", 9, false],
-        ["_pad", 7, false]
+        ["pad0", 7, false]
       ]
     },
     {
@@ -525,6 +525,22 @@
     {
       "id" : 1,
       "name" : "fl",
+      "source_info" : {
+        "filename" : "p4src/v1model/./include/control/table0.p4",
+        "line" : 38,
+        "column" : 34,
+        "source_fragment" : "{standard_metadata.ingress_port}"
+      },
+      "elements" : [
+        {
+          "type" : "field",
+          "value" : ["standard_metadata", "ingress_port"]
+        }
+      ]
+    },
+    {
+      "id" : 2,
+      "name" : "fl_0",
       "source_info" : {
         "filename" : "p4src/v1model/bmv2_MF.p4",
         "line" : 181,
@@ -1396,8 +1412,34 @@
       ]
     },
     {
-      "name" : "ingress.table0_control.set_egress_port",
+      "name" : "ingress.table0_control.clone_to_cpu",
       "id" : 4,
+      "runtime_data" : [],
+      "primitives" : [
+        {
+          "op" : "clone_ingress_pkt_to_egress",
+          "parameters" : [
+            {
+              "type" : "hexstr",
+              "value" : "0x00000063"
+            },
+            {
+              "type" : "hexstr",
+              "value" : "0x1"
+            }
+          ],
+          "source_info" : {
+            "filename" : "p4src/v1model/./include/control/table0.p4",
+            "line" : 38,
+            "column" : 8,
+            "source_fragment" : "clone3(CloneType.I2E, 99, {standard_metadata.ingress_port})"
+          }
+        }
+      ]
+    },
+    {
+      "name" : "ingress.table0_control.set_egress_port",
+      "id" : 5,
       "runtime_data" : [
         {
           "name" : "port",
@@ -1419,7 +1461,7 @@
           ],
           "source_info" : {
             "filename" : "p4src/v1model/./include/control/table0.p4",
-            "line" : 38,
+            "line" : 42,
             "column" : 8,
             "source_fragment" : "standard_metadata.egress_spec = port"
           }
@@ -1428,7 +1470,7 @@
     },
     {
       "name" : "ingress.table0_control.drop",
-      "id" : 5,
+      "id" : 6,
       "runtime_data" : [],
       "primitives" : [
         {
@@ -1441,7 +1483,7 @@
           ],
           "source_info" : {
             "filename" : "p4src/v1model/./include/control/table0.p4",
-            "line" : 42,
+            "line" : 46,
             "column" : 8,
             "source_fragment" : "mark_to_drop(standard_metadata)"
           }
@@ -1450,31 +1492,9 @@
     },
     {
       "name" : "ingress.host_meter_control.read_meter",
-      "id" : 6,
-      "runtime_data" : [],
-      "primitives" : []
-    },
-    {
-      "name" : "ingress.drop",
       "id" : 7,
       "runtime_data" : [],
-      "primitives" : [
-        {
-          "op" : "mark_to_drop",
-          "parameters" : [
-            {
-              "type" : "header",
-              "value" : "standard_metadata"
-            }
-          ],
-          "source_info" : {
-            "filename" : "p4src/v1model/bmv2_MF.p4",
-            "line" : 43,
-            "column" : 8,
-            "source_fragment" : "mark_to_drop(standard_metadata)"
-          }
-        }
-      ]
+      "primitives" : []
     },
     {
       "name" : "ingress.drop",
@@ -1521,8 +1541,30 @@
       ]
     },
     {
-      "name" : "ingress.set_egress_port",
+      "name" : "ingress.drop",
       "id" : 10,
+      "runtime_data" : [],
+      "primitives" : [
+        {
+          "op" : "mark_to_drop",
+          "parameters" : [
+            {
+              "type" : "header",
+              "value" : "standard_metadata"
+            }
+          ],
+          "source_info" : {
+            "filename" : "p4src/v1model/bmv2_MF.p4",
+            "line" : 43,
+            "column" : 8,
+            "source_fragment" : "mark_to_drop(standard_metadata)"
+          }
+        }
+      ]
+    },
+    {
+      "name" : "ingress.set_egress_port",
+      "id" : 11,
       "runtime_data" : [
         {
           "name" : "dst_port",
@@ -1553,7 +1595,7 @@
     },
     {
       "name" : "ingress.set_multicast_group",
-      "id" : 11,
+      "id" : 12,
       "runtime_data" : [
         {
           "name" : "gid",
@@ -1613,7 +1655,7 @@
     },
     {
       "name" : "ingress.to_cpu",
-      "id" : 12,
+      "id" : 13,
       "runtime_data" : [],
       "primitives" : [
         {
@@ -1673,7 +1715,7 @@
     },
     {
       "name" : "ingress.set_next_mf_hop",
-      "id" : 13,
+      "id" : 14,
       "runtime_data" : [
         {
           "name" : "dst_port",
@@ -1704,7 +1746,7 @@
     },
     {
       "name" : "ingress.send_to_cpu",
-      "id" : 14,
+      "id" : 15,
       "runtime_data" : [],
       "primitives" : [
         {
@@ -1730,7 +1772,7 @@
     },
     {
       "name" : "ingress.clone_to_cpu",
-      "id" : 15,
+      "id" : 16,
       "runtime_data" : [],
       "primitives" : [
         {
@@ -1742,7 +1784,7 @@
             },
             {
               "type" : "hexstr",
-              "value" : "0x1"
+              "value" : "0x2"
             }
           ],
           "source_info" : {
@@ -1756,7 +1798,7 @@
     },
     {
       "name" : "act",
-      "id" : 16,
+      "id" : 17,
       "runtime_data" : [],
       "primitives" : [
         {
@@ -1778,7 +1820,7 @@
     },
     {
       "name" : "act_0",
-      "id" : 17,
+      "id" : 18,
       "runtime_data" : [],
       "primitives" : [
         {
@@ -1891,7 +1933,7 @@
     },
     {
       "name" : "act_1",
-      "id" : 18,
+      "id" : 19,
       "runtime_data" : [],
       "primitives" : [
         {
@@ -1942,7 +1984,7 @@
     },
     {
       "name" : "act_2",
-      "id" : 19,
+      "id" : 20,
       "runtime_data" : [],
       "primitives" : [
         {
@@ -1968,7 +2010,7 @@
     },
     {
       "name" : "act_3",
-      "id" : 20,
+      "id" : 21,
       "runtime_data" : [],
       "primitives" : [
         {
@@ -1990,7 +2032,7 @@
     },
     {
       "name" : "act_4",
-      "id" : 21,
+      "id" : 22,
       "runtime_data" : [],
       "primitives" : [
         {
@@ -2041,7 +2083,7 @@
     },
     {
       "name" : "act_5",
-      "id" : 22,
+      "id" : 23,
       "runtime_data" : [],
       "primitives" : [
         {
@@ -2071,7 +2113,7 @@
     },
     {
       "name" : "act_6",
-      "id" : 23,
+      "id" : 24,
       "runtime_data" : [],
       "primitives" : [
         {
@@ -2101,7 +2143,7 @@
     },
     {
       "name" : "act_7",
-      "id" : 24,
+      "id" : 25,
       "runtime_data" : [],
       "primitives" : [
         {
@@ -2123,7 +2165,7 @@
     },
     {
       "name" : "act_8",
-      "id" : 25,
+      "id" : 26,
       "runtime_data" : [],
       "primitives" : [
         {
@@ -2236,7 +2278,7 @@
     },
     {
       "name" : "act_9",
-      "id" : 26,
+      "id" : 27,
       "runtime_data" : [],
       "primitives" : [
         {
@@ -2304,14 +2346,14 @@
           "with_counters" : false,
           "support_timeout" : false,
           "direct_meters" : null,
-          "action_ids" : [17],
+          "action_ids" : [18],
           "actions" : ["act_0"],
           "base_default_next" : "node_3",
           "next_tables" : {
             "act_0" : "node_3"
           },
           "default_entry" : {
-            "action_id" : 17,
+            "action_id" : 18,
             "action_const" : true,
             "action_data" : [],
             "action_entry_const" : true
@@ -2333,14 +2375,14 @@
           "with_counters" : false,
           "support_timeout" : false,
           "direct_meters" : null,
-          "action_ids" : [16],
+          "action_ids" : [17],
           "actions" : ["act"],
           "base_default_next" : "node_5",
           "next_tables" : {
             "act" : "node_5"
           },
           "default_entry" : {
-            "action_id" : 16,
+            "action_id" : 17,
             "action_const" : true,
             "action_data" : [],
             "action_entry_const" : true
@@ -2362,14 +2404,14 @@
           "with_counters" : false,
           "support_timeout" : false,
           "direct_meters" : null,
-          "action_ids" : [18],
+          "action_ids" : [19],
           "actions" : ["act_1"],
           "base_default_next" : "ingress.table0_control.table0",
           "next_tables" : {
             "act_1" : "ingress.table0_control.table0"
           },
           "default_entry" : {
-            "action_id" : 18,
+            "action_id" : 19,
             "action_const" : true,
             "action_data" : [],
             "action_entry_const" : true
@@ -2380,7 +2422,7 @@
           "id" : 3,
           "source_info" : {
             "filename" : "p4src/v1model/./include/control/table0.p4",
-            "line" : 45,
+            "line" : 49,
             "column" : 10,
             "source_fragment" : "table0"
           },
@@ -2446,17 +2488,18 @@
           "with_counters" : true,
           "support_timeout" : false,
           "direct_meters" : null,
-          "action_ids" : [4, 3, 2, 5],
-          "actions" : ["ingress.table0_control.set_egress_port", "ingress.table0_control.send_to_cpu", "ingress.table0_control.set_next_hop_id", "ingress.table0_control.drop"],
+          "action_ids" : [5, 3, 4, 2, 6],
+          "actions" : ["ingress.table0_control.set_egress_port", "ingress.table0_control.send_to_cpu", "ingress.table0_control.clone_to_cpu", "ingress.table0_control.set_next_hop_id", "ingress.table0_control.drop"],
           "base_default_next" : "tbl_act_2",
           "next_tables" : {
             "ingress.table0_control.set_egress_port" : "tbl_act_2",
             "ingress.table0_control.send_to_cpu" : "tbl_act_2",
+            "ingress.table0_control.clone_to_cpu" : "tbl_act_2",
             "ingress.table0_control.set_next_hop_id" : "tbl_act_2",
             "ingress.table0_control.drop" : "tbl_act_2"
           },
           "default_entry" : {
-            "action_id" : 5,
+            "action_id" : 6,
             "action_const" : true,
             "action_data" : [],
             "action_entry_const" : true
@@ -2478,14 +2521,14 @@
           "with_counters" : false,
           "support_timeout" : false,
           "direct_meters" : null,
-          "action_ids" : [19],
+          "action_ids" : [20],
           "actions" : ["act_2"],
           "base_default_next" : "ingress.host_meter_control.host_meter",
           "next_tables" : {
             "act_2" : "ingress.host_meter_control.host_meter"
           },
           "default_entry" : {
-            "action_id" : 19,
+            "action_id" : 20,
             "action_const" : true,
             "action_data" : [],
             "action_entry_const" : true
@@ -2514,7 +2557,7 @@
           "with_counters" : false,
           "support_timeout" : false,
           "direct_meters" : "ingress.host_meter_control.host_meter_counter",
-          "action_ids" : [6, 0],
+          "action_ids" : [7, 0],
           "actions" : ["ingress.host_meter_control.read_meter", "NoAction"],
           "base_default_next" : "node_10",
           "next_tables" : {
@@ -2544,14 +2587,14 @@
           "with_counters" : false,
           "support_timeout" : false,
           "direct_meters" : null,
-          "action_ids" : [20],
+          "action_ids" : [21],
           "actions" : ["act_3"],
           "base_default_next" : "node_12",
           "next_tables" : {
             "act_3" : "node_12"
           },
           "default_entry" : {
-            "action_id" : 20,
+            "action_id" : 21,
             "action_const" : true,
             "action_data" : [],
             "action_entry_const" : true
@@ -2573,14 +2616,14 @@
           "with_counters" : false,
           "support_timeout" : false,
           "direct_meters" : null,
-          "action_ids" : [21],
+          "action_ids" : [22],
           "actions" : ["act_4"],
           "base_default_next" : "node_14",
           "next_tables" : {
             "act_4" : "node_14"
           },
           "default_entry" : {
-            "action_id" : 21,
+            "action_id" : 22,
             "action_const" : true,
             "action_data" : [],
             "action_entry_const" : true
@@ -2621,7 +2664,7 @@
           "with_counters" : true,
           "support_timeout" : false,
           "direct_meters" : null,
-          "action_ids" : [13, 12],
+          "action_ids" : [14, 13],
           "actions" : ["ingress.set_next_mf_hop", "ingress.to_cpu"],
           "base_default_next" : "ingress.acl_table",
           "next_tables" : {
@@ -2629,7 +2672,7 @@
             "ingress.to_cpu" : "ingress.acl_table"
           },
           "default_entry" : {
-            "action_id" : 12,
+            "action_id" : 13,
             "action_const" : false,
             "action_data" : [],
             "action_entry_const" : false
@@ -2658,7 +2701,7 @@
           "with_counters" : true,
           "support_timeout" : false,
           "direct_meters" : null,
-          "action_ids" : [10, 7],
+          "action_ids" : [11, 8],
           "actions" : ["ingress.set_egress_port", "ingress.drop"],
           "base_default_next" : null,
           "next_tables" : {
@@ -2666,7 +2709,7 @@
             "__MISS__" : "tbl_act_6"
           },
           "default_entry" : {
-            "action_id" : 7,
+            "action_id" : 8,
             "action_const" : true,
             "action_data" : [],
             "action_entry_const" : true
@@ -2682,14 +2725,14 @@
           "with_counters" : false,
           "support_timeout" : false,
           "direct_meters" : null,
-          "action_ids" : [22],
+          "action_ids" : [23],
           "actions" : ["act_5"],
           "base_default_next" : "node_19",
           "next_tables" : {
             "act_5" : "node_19"
           },
           "default_entry" : {
-            "action_id" : 22,
+            "action_id" : 23,
             "action_const" : true,
             "action_data" : [],
             "action_entry_const" : true
@@ -2705,14 +2748,14 @@
           "with_counters" : false,
           "support_timeout" : false,
           "direct_meters" : null,
-          "action_ids" : [23],
+          "action_ids" : [24],
           "actions" : ["act_6"],
           "base_default_next" : "node_19",
           "next_tables" : {
             "act_6" : "node_19"
           },
           "default_entry" : {
-            "action_id" : 23,
+            "action_id" : 24,
             "action_const" : true,
             "action_data" : [],
             "action_entry_const" : true
@@ -2741,7 +2784,7 @@
           "with_counters" : true,
           "support_timeout" : false,
           "direct_meters" : null,
-          "action_ids" : [11, 8],
+          "action_ids" : [12, 9],
           "actions" : ["ingress.set_multicast_group", "ingress.drop"],
           "base_default_next" : "ingress.acl_table",
           "next_tables" : {
@@ -2749,7 +2792,7 @@
             "ingress.drop" : "ingress.acl_table"
           },
           "default_entry" : {
-            "action_id" : 8,
+            "action_id" : 9,
             "action_const" : true,
             "action_data" : [],
             "action_entry_const" : true
@@ -2820,7 +2863,7 @@
           "with_counters" : true,
           "support_timeout" : false,
           "direct_meters" : null,
-          "action_ids" : [14, 15, 9, 1],
+          "action_ids" : [15, 16, 10, 1],
           "actions" : ["ingress.send_to_cpu", "ingress.clone_to_cpu", "ingress.drop", "NoAction"],
           "base_default_next" : null,
           "next_tables" : {
@@ -3042,14 +3085,14 @@
           "with_counters" : false,
           "support_timeout" : false,
           "direct_meters" : null,
-          "action_ids" : [25],
+          "action_ids" : [26],
           "actions" : ["act_8"],
           "base_default_next" : "node_25",
           "next_tables" : {
             "act_8" : "node_25"
           },
           "default_entry" : {
-            "action_id" : 25,
+            "action_id" : 26,
             "action_const" : true,
             "action_data" : [],
             "action_entry_const" : true
@@ -3071,14 +3114,14 @@
           "with_counters" : false,
           "support_timeout" : false,
           "direct_meters" : null,
-          "action_ids" : [24],
+          "action_ids" : [25],
           "actions" : ["act_7"],
           "base_default_next" : "node_27",
           "next_tables" : {
             "act_7" : "node_27"
           },
           "default_entry" : {
-            "action_id" : 24,
+            "action_id" : 25,
             "action_const" : true,
             "action_data" : [],
             "action_entry_const" : true
@@ -3100,14 +3143,14 @@
           "with_counters" : false,
           "support_timeout" : false,
           "direct_meters" : null,
-          "action_ids" : [26],
+          "action_ids" : [27],
           "actions" : ["act_9"],
           "base_default_next" : null,
           "next_tables" : {
             "act_9" : null
           },
           "default_entry" : {
-            "action_id" : 26,
+            "action_id" : 27,
             "action_const" : true,
             "action_data" : [],
             "action_entry_const" : true

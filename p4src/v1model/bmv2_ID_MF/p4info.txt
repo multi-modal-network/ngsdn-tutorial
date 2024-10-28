@@ -68,6 +68,9 @@ tables {
     id: 16783057
   }
   action_refs {
+    id: 16791174
+  }
+  action_refs {
     id: 16777316
   }
   action_refs {
@@ -311,6 +314,13 @@ actions {
 }
 actions {
   preamble {
+    id: 16791174
+    name: "ingress.table0_control.clone_to_cpu"
+    alias: "table0_control.clone_to_cpu"
+  }
+}
+actions {
+  preamble {
     id: 16822046
     name: "ingress.table0_control.set_egress_port"
     alias: "table0_control.set_egress_port"
@@ -408,7 +418,7 @@ actions {
   preamble {
     id: 16830591
     name: "ingress.clone_to_cpu"
-    alias: "clone_to_cpu"
+    alias: "ingress.clone_to_cpu"
   }
 }
 counters {
@@ -546,7 +556,7 @@ controller_packet_metadata {
   }
   metadata {
     id: 2
-    name: "_pad"
+    name: "pad0"
     bitwidth: 7
   }
 }
@@ -564,7 +574,7 @@ controller_packet_metadata {
   }
   metadata {
     id: 2
-    name: "_pad"
+    name: "pad0"
     bitwidth: 7
   }
 }

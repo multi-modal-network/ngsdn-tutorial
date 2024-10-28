@@ -228,13 +228,13 @@ header id_t {
 @controller_header("packet_in")
 header packet_in_t {
     port_num_t ingress_port;
-    bit<7> _pad;
+    bit<7> pad0;
 }
 
 @controller_header("packet_out")
 header packet_out_t {
     port_num_t egress_port;
-    bit<7> _pad;
+    bit<7> pad0;
 }
 
 struct headers_t {

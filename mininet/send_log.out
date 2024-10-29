@@ -1,12 +1,13 @@
 WARNING: Mac address to reach destination not found. Using broadcast.
 WARNING: Mac address to reach destination not found. Using broadcast.
-modal_type:id, frequency:1, source_host:167, destination_host:175
+modal_type:ndn, frequency:1, source_host:167, destination_host:170
+202371726 2151
 ###[ Ethernet ]### 
   dst       = ff:ff:ff:ff:ff:ff
   src       = 00:00:00:00:00:00
-  type      = 0x812
+  type      = 0x8624
 ###[ Raw ]### 
-     load      = '\x0c\x0f\\xf2\\x8b\x0c\x0f\\xf2\\x93'
+     load      = '\x06\\xfd\x00 \x08\x0c\x08\x04\x0c\x0f\\xf2\\x8b\x08\\x84\x0c\x0f\\xf2\\x8e\x1e\x00\x18\x02\x00\x00\x19\x02\x00\x00\x1b\x02\x00\x00\x1a\x02\x08g'
 
-sending on interface h167-eth0 form 167 to 175, model : id 
-['id', '165', '178'] 25 ['id', '165', '178'] 25
+sending on interface h167-eth0 form 167 to 170, model : ndn 
+['ndn', '167', '178'] 30 ['ndn', '167', '178'] 30

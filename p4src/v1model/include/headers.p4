@@ -96,15 +96,15 @@ header ndp_t {
     bit<48>      target_mac_addr;
 }
 
-header ndn_tlv_prefix_t {
-    bit<8> code;
-    bit<8> length;
-}
-
 header ndn_prefix_t {
     bit<8> code;
     bit<8> len_code;
     bit<16> length;
+}
+
+header ndn_tlv_prefix_t {
+    bit<8> code;
+    bit<8> length;
 }
 
 header name_component_t {

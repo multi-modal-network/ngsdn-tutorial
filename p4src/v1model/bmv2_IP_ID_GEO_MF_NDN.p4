@@ -245,7 +245,6 @@ control ingress(inout headers_t hdr,
         standard_metadata.egress_spec = dst_port;
     }
 
-    // Look for the "implementation" property in the table definition.
     table routing_v6_table {
       key = {
           hdr.ethernet.ether_type: exact;

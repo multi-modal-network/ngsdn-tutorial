@@ -1,16 +1,15 @@
 WARNING: Mac address to reach destination not found. Using broadcast.
 WARNING: Mac address to reach destination not found. Using broadcast.
 WARNING: more Mac address to reach destination not found. Using broadcast.
-modal_type:ndn, frequency:1, source_host:166, destination_host:178
-202371734 2150
+modal_type:id, frequency:1, source_host:165, destination_host:177
 ###[ Ethernet ]### 
   dst       = ff:ff:ff:ff:ff:ff
   src       = 00:00:00:00:00:00
-  type      = 0x8624
+  type      = 0x812
 ###[ Raw ]### 
-     load      = '\x06\\xfd\x00 \x08\x0c\x08\x04\x0c\x0f\\xf2\\x8a\x08\\x84\x0c\x0f\\xf2\\x96\x1e\x00\x18\x02\x00\x00\x19\x02\x00\x00\x1b\x02\x00\x00\x1a\x02\x08f'
+     load      = '\x0c\x0f\\xf2\\x89\x0c\x0f\\xf2\\x95'
 
-sending on interface h166-eth0 form 166 to 178, model : ndn 
-['id', '166', '178'] 27 ['ndn', '166', '178'] 28
-ndn 166 178 ndn 166 178
+sending on interface h165-eth0 form 165 to 177, model : id 
+['id', '169', '177'] 31 ['id', '165', '177'] 32
+id 165 177 id 165 177
 resend!

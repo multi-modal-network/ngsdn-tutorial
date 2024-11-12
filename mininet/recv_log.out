@@ -1,77 +1,15 @@
-sniffing on h178-eth0
+sniffing on h177-eth0
 
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-:ff:ff:ff:ff
-  src       = 00:00:00:00:00:00
-  type      = 0x812
-###[ Raw ]### 
-     load      = '\x0c\x0f\\xf2\\x8a\x0c\x0f\\xf2\\x96'
-
-------------------------------------
-
-
-
-got an NDN packet
+got an ID packet
 ###[ Ethernet ]### 
   dst       = ff:ff:ff:ff:ff:ff
   src       = 00:00:00:00:00:00
-  type      = 0x8624
+  type      = 0x812
 ###[ Raw ]### 
-     load      = '\x06\\xfd\x00 \x08\x0c\x08\x04\x0c\x0f\\xf2\\x8a\x08\\x84\x0c\x0f\\xf2\\x96\x1e\x00\x18\x02\x00\x00\x19\x02\x00\x00\x1b\x02\x00\x00\x1a\x02\x08f'
+     load      = '\x0c\x0f\\xf2\\x8d\x0c\x0f\\xf2\\x95'
 
 ------------------------------------
 
@@ -81,59 +19,27 @@ got an NDN packet
 
 
 
+got an ID packet
+###[ Ethernet ]### 
+  dst       = ff:ff:ff:ff:ff:ff
+  src       = 00:00:00:00:00:00
+  type      = 0x812
+###[ Raw ]### 
+     load      = '\x0c\x0f\\xf2\\x8d\x0c\x0f\\xf2\\x95'
+
+------------------------------------
 
 
 
+got an ID packet
+###[ Ethernet ]### 
+  dst       = ff:ff:ff:ff:ff:ff
+  src       = 00:00:00:00:00:00
+  type      = 0x812
+###[ Raw ]### 
+     load      = '\x0c\x0f\\xf2\\x89\x0c\x0f\\xf2\\x95'
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+------------------------------------
 
 
 

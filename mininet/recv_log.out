@@ -1,5 +1,203 @@
-sniffing on h177-eth0
+sniffing on h165-eth0
+got an IP packet
+###[ Ethernet ]### 
+  dst       = ff:ff:ff:ff:ff:ff
+  src       = 00:00:00:00:02:49
+  type      = IPv4
+###[ IP ]### 
+     version   = 4
+     ihl       = 5
+     tos       = 0x0
+     len       = 40
+     id        = 1
+     flags     = 
+     frag      = 0
+     ttl       = 64
+     proto     = tcp
+     chksum    = 0x1e85
+     src       = 172.20.2.21
+     dst       = 172.20.2.13
+     \options   \
+###[ TCP ]### 
+        sport     = 49152
+        dport     = 1234
+        seq  got an ID packet
+###[ Ethernet ]### 
+  dst       = ff:ff:ff:ff:ff:ff
+  src       = 00:00:00:00:00:00
+  type      = 0x812
+###[ Raw ]### 
+     load      = '\x0c\x0f\\xf2\\x91\x0c\x0f\\xf2\\x8a'
 
+------------------------------------
+
+
+
+go
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ = '\x06\\xfd\x00 \x08\x0c\x08\x04\x0c\x0f\\xf2\\x91\x08\\x84\x0c\x0f\\xf2\\x8a\x1e\x00\x18\x02\x00\x00\x19\x02\x00\x00\x1b\x02\x00\x00\x1a\x02\x08m'
+
+------------------------------------
+
+
+
+got an MF packet
+###[ Ethernet ]### 
+  dst       = ff:ff:ff:ff:ff:ff
+  src       = 00:00:00:00:00:00
+  type      = 0x27c0
+###[ Raw ]### 
+     load      = '\x00\x00\x00\x01\x00\x00\x00n\x00\x00\x00g'
+
+------------------------------------
 
 
 
@@ -9,7 +207,7 @@ got an ID packet
   src       = 00:00:00:00:00:00
   type      = 0x812
 ###[ Raw ]### 
-     load      = '\x0c\x0f\\xf2\\x8d\x0c\x0f\\xf2\\x95'
+     load      = '\x0c\x0f\\xf2\\x91\x0c\x0f\\xf2\\x8a'
 
 ------------------------------------
 
@@ -19,27 +217,149 @@ got an ID packet
 
 
 
-got an ID packet
-###[ Ethernet ]### 
-  dst       = ff:ff:ff:ff:ff:ff
-  src       = 00:00:00:00:00:00
-  type      = 0x812
-###[ Raw ]### 
-     load      = '\x0c\x0f\\xf2\\x8d\x0c\x0f\\xf2\\x95'
-
-------------------------------------
 
 
 
-got an ID packet
-###[ Ethernet ]### 
-  dst       = ff:ff:ff:ff:ff:ff
-  src       = 00:00:00:00:00:00
-  type      = 0x812
-###[ Raw ]### 
-     load      = '\x0c\x0f\\xf2\\x89\x0c\x0f\\xf2\\x95'
 
-------------------------------------
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

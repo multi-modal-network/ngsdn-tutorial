@@ -51,8 +51,18 @@ header ipv4_t {
     bit<32>   dstAddr;
 }
 
+header flexip_t {
+    bit<4>    version;
+    bit<2>    srcFormat;
+    bit<2>    dstFormat;
+    bit<12>   srcLength;
+    bit<12>   dstLength;
+    bit<384>  srcAddr;
+    bit<384>  dstAddr;
+}
+
 header tcp_t {
-bit<16>  src_port;
+    bit<16>  src_port;
     bit<16>  dst_port;
     bit<32>  seq_no;
     bit<32>  ack_no;
@@ -243,6 +253,7 @@ struct headers_t {
     ethernet_t    ethernet;
     ipv6_t        ipv6;
     ipv4_t        ipv4;
+    flexip_t      flexip;
     id_t          id;
     mf_t          mf;
     geo_t         geo;

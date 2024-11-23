@@ -98,7 +98,9 @@ deep-clean: clean
 
 p4-build-single: p4src/v1model/${P4_FILE}.p4
 	$(info *** Building P4 program...)
-	@rm -r p4src/v1model/${P4_FILE}
+	@if [ -d "p4src/v1model/${P4_FILE}"]; then \
+		rm -r p4src/v1model/${P4_FILE}; \
+	fi
 	@mkdir -p p4src/v1model/${P4_FILE}
 	docker run --rm -v ${curr_dir}:/workdir -w /workdir ${P4C_IMG} \
 		p4c-bm2-ss --arch v1model -o p4src/v1model/${P4_FILE}/bmv2.json \

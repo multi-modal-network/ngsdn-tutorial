@@ -45,6 +45,7 @@ const bit<16> ETHERTYPE_ID = 0x0812;
 const bit<16> ETHERTYPE_GEO = 0x8947;
 const bit<16> ETHERTYPE_MF = 0x27c0;
 const bit<16> ETHERTYPE_NDN = 0x8624;
+const bit<16> ETHERTYPE_FLEXIP = 0x3690;
 
 const bit<4> TYPE_geo_beacon = 1;
 const bit<4> TYPE_geo_gbc = 4;

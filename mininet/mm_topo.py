@@ -75,7 +75,7 @@ def customFlexIP(vmx, i):
     F2 = (1<<50) + vmx * 100000000 + i - 64
     F4 = (1<<200) + vmx * 100000000000 + i - 64
     if 65<=i<=68:
-        return "F0/{:04X}".format(F1)
+        return "F0/{:04X}".format(F0)
     elif 69<=i<=72:
         return "F1/{:08X}".format(F1)
     elif 73<=i<=76:

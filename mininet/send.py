@@ -263,7 +263,7 @@ def generate_flexip_pkt(ethertype, source_host, destination_host):
             print(f"Invalid hexadecimal substring: {substring}")
     src += [0] * (12 - len(src))
     dst += [0] * (12 - len(dst))
-    print("src:{}, dst:{}", src, dst)
+    print("src:{}, dst:{}, flexip_prefix", src, dst, flexip_prefix)
     pkt = Ether(type=ethertype)
     pkt = pkt / Raw(load=struct.pack("!LLLLLLLLLLLLLLLLLLLLLLLLL", flexip_prefix, *src[:12], *dst[:12]))
     pkt.show2()

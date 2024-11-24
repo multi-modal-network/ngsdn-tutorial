@@ -12,6 +12,7 @@ geo_ethertype = 0x8947
 mf_ethertype = 0x27c0
 ndn_ethertype = 0x8624
 ip_ethertype = 0x0800
+flexip_ethertype = 0x3690
 
 def get_if():
     ifs=get_if_list()
@@ -56,6 +57,10 @@ def handle_pkt(pkt):
         print("------------------------------------\n")
     elif pkt.haslayer("Ether") and pkt[Ether].type == ip_ethertype:
         print("got an IP packet")
+        pkt.show2()
+        print("------------------------------------\n")
+    elif pkt.haslayer("Ether") and pkt[Ether].type == flexip_ethertype:
+        print("got an FlexIP packet")
         pkt.show2()
         print("------------------------------------\n")
         

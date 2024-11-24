@@ -1,16 +1,13 @@
 WARNING: Mac address to reach destination not found. Using broadcast.
 WARNING: Mac address to reach destination not found. Using broadcast.
-modal_type:flexip, frequency:1, source_host:164, destination_host:165
-generate_flexip_pkt 164 165
-substring 40000000
-substring F0086500
-src:{}, dst:{}, flexip_prefix [1073741824, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0] [4027081984, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0] 16810008
+modal_type:ndn, frequency:1, source_host:164, destination_host:165
+202371721 2148
 ###[ Ethernet ]### 
   dst       = ff:ff:ff:ff:ff:ff
   src       = 00:00:00:00:00:00
-  type      = 0x3690
+  type      = 0x8624
 ###[ Raw ]### 
-     load      = '\x01\x00\\x80\x18@\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\\xf0\x08e\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00'
+     load      = '\x06\\xfd\x00 \x08\x0c\x08\x04\x0c\x0f\\xf2\\x88\x08\\x84\x0c\x0f\\xf2\\x89\x1e\x00\x18\x02\x00\x00\x19\x02\x00\x00\x1b\x02\x00\x00\x1a\x02\x08d'
 
-sending on interface h164-eth0 form 164 to 165, model : flexip 
-['flexip', '190', '187'] 51 ['flexip', '190', '187'] 51
+sending on interface h164-eth0 form 164 to 165, model : ndn 
+['ndn', '164', '165'] 46 ['ndn', '164', '165'] 46

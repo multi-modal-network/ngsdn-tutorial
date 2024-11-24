@@ -46,6 +46,7 @@ parser parser_impl(packet_in packet,
             ETHERTYPE_GEO: parse_geo;
             ETHERTYPE_MF: parse_mf;
             ETHERTYPE_NDN: parse_ndn;
+            ETHERTYPE_FLEXIP: parse_flexip;
             default: accept;
         }
     }
@@ -138,6 +139,12 @@ parser parser_impl(packet_in packet,
 
     state parse_gbc{
         packet.extract(hdr.gbc);
+        transition accept;
+    }
+
+    // FlexIP
+    state parse_flexip {
+        packet.extract(hdr.flexip);
         transition accept;
     }
 

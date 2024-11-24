@@ -675,6 +675,12 @@
               "next_state" : "parse_ndn"
             },
             {
+              "type" : "hexstr",
+              "value" : "0x3690",
+              "mask" : null,
+              "next_state" : "parse_flexip"
+            },
+            {
               "value" : "default",
               "mask" : null,
               "next_state" : null
@@ -1039,8 +1045,31 @@
           "transition_key" : []
         },
         {
-          "name" : "parse_tcp",
+          "name" : "parse_flexip",
           "id" : 13,
+          "parser_ops" : [
+            {
+              "parameters" : [
+                {
+                  "type" : "regular",
+                  "value" : "_flexip5"
+                }
+              ],
+              "op" : "extract"
+            }
+          ],
+          "transitions" : [
+            {
+              "value" : "default",
+              "mask" : null,
+              "next_state" : null
+            }
+          ],
+          "transition_key" : []
+        },
+        {
+          "name" : "parse_tcp",
+          "id" : 14,
           "parser_ops" : [
             {
               "parameters" : [
@@ -1089,7 +1118,7 @@
         },
         {
           "name" : "parse_udp",
-          "id" : 14,
+          "id" : 15,
           "parser_ops" : [
             {
               "parameters" : [
@@ -1146,7 +1175,7 @@
       "id" : 0,
       "source_info" : {
         "filename" : "p4src/v1model/./include/parsers.p4",
-        "line" : 159,
+        "line" : 166,
         "column" : 8,
         "source_fragment" : "deparser"
       },

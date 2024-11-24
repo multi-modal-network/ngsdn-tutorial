@@ -266,6 +266,10 @@ def generate_flexip_pkt(ethertype, source_host, destination_host):
     print("src:{}, dst:{}, flexip_prefix", src, dst, flexip_prefix)
     pkt = Ether(type=ethertype)
     pkt = pkt / Raw(load=struct.pack("!LLLLLLLLLLLLLLLLLLLLLLLLL", flexip_prefix, *src[:12], *dst[:12]))
+    # hex_string = hex(flexip_prefix)[2:10].zfill(8) + srcFlexIP.zfill(96) + dstFlexIP.zfill(96)
+    # print(hex_string)
+    # raw_data = bytes.fromhex(hex_string)
+    # pkt = pkt / Raw(load=raw_data)
     pkt.show2()
     return pkt
 

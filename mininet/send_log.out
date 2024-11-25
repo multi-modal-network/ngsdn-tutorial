@@ -1,13 +1,26 @@
 WARNING: Mac address to reach destination not found. Using broadcast.
 WARNING: Mac address to reach destination not found. Using broadcast.
-modal_type:ndn, frequency:1, source_host:164, destination_host:165
-202371721 2148
+modal_type:flexip, frequency:1, source_host:180, destination_host:172
+generate_flexip_pkt 180 172
+substring F4000000
+substring 00000001
+substring 00000000
+substring 00000000
+substring 00000000
+substring 00000000
+substring 00000000
+substring 174876E8
+substring 10000000
+substring F10C0FF2
+substring 90000000
+src:{}, dst:{}, flexip_prefix [4093640704, 1, 0, 0, 0, 0, 0, 390625000, 268435456, 0, 0, 0] [4044099570, 2415919104, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0] 84967464
+05108028000000000000000000000000000000F4000000000000010000000000000000000000000000000000000000174876E81000000000000000000000000000000000000000000000000000000000000000000000000000000000000000F10C0FF290
 ###[ Ethernet ]### 
   dst       = ff:ff:ff:ff:ff:ff
   src       = 00:00:00:00:00:00
-  type      = 0x8624
+  type      = 0x3690
 ###[ Raw ]### 
-     load      = '\x06\\xfd\x00 \x08\x0c\x08\x04\x0c\x0f\\xf2\\x88\x08\\x84\x0c\x0f\\xf2\\x89\x1e\x00\x18\x02\x00\x00\x19\x02\x00\x00\x1b\x02\x00\x00\x1a\x02\x08d'
+     load      = '\x05\x10\\x80(\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\\xf4\x00\x00\x00\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x17Hv\\xe8\x10\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\\xf1\x0c\x0f\\xf2\\x90'
 
-sending on interface h164-eth0 form 164 to 165, model : ndn 
-['ndn', '164', '165'] 46 ['ndn', '164', '165'] 46
+sending on interface h180-eth0 form 180 to 172, model : flexip 
+['flexip', '180', '172'] 56 ['flexip', '180', '172'] 56

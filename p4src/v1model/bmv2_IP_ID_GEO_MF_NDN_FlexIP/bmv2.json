@@ -1179,7 +1179,7 @@
         "column" : 8,
         "source_fragment" : "deparser"
       },
-      "order" : ["_packet_in1", "_ethernet2", "_ndn_ndn_prefix11", "_ndn_name_tlv_ndn_tlv_prefix12", "_ndn_name_tlv_components13[0]", "_ndn_name_tlv_components13[1]", "_ndn_name_tlv_components13[2]", "_ndn_name_tlv_components13[3]", "_ndn_name_tlv_components13[4]", "_ndn_name_tlv_components13[5]", "_ndn_name_tlv_components13[6]", "_ndn_name_tlv_components13[7]", "_ndn_metaInfo_tlv_ndn_tlv_prefix14", "_ndn_metaInfo_tlv_content_type_tlv15", "_ndn_metaInfo_tlv_freshness_period_tlv16", "_ndn_metaInfo_tlv_final_block_id_tlv17", "_ndn_content_tlv18", "_mf7", "_id6", "_geo8", "_gbc9", "_beacon10", "_ipv63", "_ipv44", "_tcp19", "_udp20", "_icmpv621", "_ndp22"]
+      "order" : ["_packet_in1", "_ethernet2", "_ndn_ndn_prefix11", "_ndn_name_tlv_ndn_tlv_prefix12", "_ndn_name_tlv_components13[0]", "_ndn_name_tlv_components13[1]", "_ndn_name_tlv_components13[2]", "_ndn_name_tlv_components13[3]", "_ndn_name_tlv_components13[4]", "_ndn_name_tlv_components13[5]", "_ndn_name_tlv_components13[6]", "_ndn_name_tlv_components13[7]", "_ndn_metaInfo_tlv_ndn_tlv_prefix14", "_ndn_metaInfo_tlv_content_type_tlv15", "_ndn_metaInfo_tlv_freshness_period_tlv16", "_ndn_metaInfo_tlv_final_block_id_tlv17", "_ndn_content_tlv18", "_mf7", "_id6", "_flexip5", "_geo8", "_gbc9", "_beacon10", "_ipv63", "_ipv44", "_tcp19", "_udp20", "_icmpv621", "_ndp22"]
     }
   ],
   "meter_arrays" : [

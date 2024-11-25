@@ -170,6 +170,7 @@ control deparser(packet_out packet, in headers_t hdr) {
         packet.emit(hdr.ndn);
 	    packet.emit(hdr.mf);
         packet.emit(hdr.id);
+        packet.emit(hdr.flexip);
         packet.emit(hdr.geo);
 	    packet.emit(hdr.gbc);
 	    packet.emit(hdr.beacon);
